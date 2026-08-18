@@ -7,6 +7,7 @@
   --prata: #c7cdd6;
   --bronze: #d99a63;
   --acento: #ec4899;
+  --acento-brilho: rgba(236, 72, 153, 0.4);
   --borda: #232733;
   --vidro-bg: rgba(255, 255, 255, 0.06);
   --vidro-borda: rgba(255, 255, 255, 0.14);
@@ -40,38 +41,39 @@ body.tema-claro {
 }
 
 body.tema-amo {
-  --bg: #150c29;
-  --bg-elevado: rgba(45, 24, 74, 0.5);
-  --texto: #f6f1ff;
-  --texto-sub: #c9b8f0;
-  --borda: rgba(167, 139, 250, 0.28);
-  --acento: #f472b6;
-  --vidro-bg: rgba(255, 255, 255, 0.07);
-  --vidro-borda: rgba(196, 165, 255, 0.28);
-  --vidro-brilho: rgba(230, 210, 255, 0.22);
-  --vidro-sombra: rgba(20, 8, 45, 0.45);
+  --bg: #0a0614;
+  --bg-elevado: rgba(28, 15, 46, 0.5);
+  --texto: #f7f3ff;
+  --texto-sub: #b9a8dd;
+  --borda: rgba(167, 139, 250, 0.22);
+  --acento: #f9a8d4;
+  --acento-brilho: rgba(249, 168, 212, 0.45);
+  --vidro-bg: rgba(255, 255, 255, 0.05);
+  --vidro-borda: rgba(196, 165, 255, 0.2);
+  --vidro-brilho: rgba(220, 200, 255, 0.16);
+  --vidro-sombra: rgba(6, 3, 14, 0.6);
 }
 
 body.tema-amo::before {
   content: '';
   position: fixed;
-  inset: -25%;
+  inset: -30%;
   z-index: -1;
   background:
-    radial-gradient(circle at 20% 25%, rgba(236, 72, 153, 0.55), transparent 40%),
-    radial-gradient(circle at 80% 15%, rgba(99, 102, 241, 0.55), transparent 42%),
-    radial-gradient(circle at 25% 80%, rgba(139, 92, 246, 0.5), transparent 45%),
-    radial-gradient(circle at 85% 80%, rgba(59, 130, 246, 0.4), transparent 45%),
-    linear-gradient(160deg, #1a0e33 0%, #2a1454 45%, #170a28 100%);
-  background-size: 160% 160%;
-  filter: blur(6px);
-  animation: liquidoAmo 26s ease-in-out infinite alternate;
+    radial-gradient(circle at 20% 25%, rgba(236, 72, 153, 0.22), transparent 38%),
+    radial-gradient(circle at 80% 15%, rgba(99, 102, 241, 0.22), transparent 40%),
+    radial-gradient(circle at 25% 80%, rgba(139, 92, 246, 0.2), transparent 42%),
+    radial-gradient(circle at 85% 80%, rgba(59, 130, 246, 0.16), transparent 42%),
+    linear-gradient(160deg, #0a0614 0%, #140a26 45%, #08040f 100%);
+  filter: blur(10px);
+  will-change: transform;
+  animation: liquidoAmo 30s ease-in-out infinite alternate;
 }
 
 @keyframes liquidoAmo {
-  0% { background-position: 0% 0%, 100% 0%, 0% 100%, 100% 100%, 50% 50%; transform: scale(1) rotate(0deg); }
-  50% { background-position: 35% 25%, 70% 35%, 25% 65%, 75% 70%, 50% 50%; transform: scale(1.1) rotate(3deg); }
-  100% { background-position: 10% 45%, 90% 5%, 45% 90%, 55% 55%, 50% 50%; transform: scale(1.02) rotate(-3deg); }
+  0% { transform: scale(1) rotate(0deg) translate(0, 0); }
+  50% { transform: scale(1.12) rotate(4deg) translate(-2%, 2%); }
+  100% { transform: scale(1.04) rotate(-4deg) translate(2%, -2%); }
 }
 
 .tela {
@@ -113,8 +115,8 @@ body.tema-amo::before {
   border-radius: 999px;
   border: 1px solid var(--vidro-borda);
   background: var(--vidro-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .cabecalho__setor {
@@ -138,8 +140,8 @@ body.tema-amo::before {
   letter-spacing: 0.12em;
   font-weight: 700;
   background: var(--vidro-bg);
-  backdrop-filter: blur(20px) saturate(160%);
-  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  backdrop-filter: blur(10px) saturate(120%);
+  -webkit-backdrop-filter: blur(10px) saturate(120%);
   border: 1px solid currentColor;
   transition: color 0.4s ease, box-shadow 0.4s ease;
 }
@@ -190,8 +192,8 @@ body.tema-amo::before {
   flex-direction: column;
   align-items: center;
   background: var(--vidro-bg);
-  backdrop-filter: blur(28px) saturate(180%);
-  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  backdrop-filter: blur(14px) saturate(130%);
+  -webkit-backdrop-filter: blur(14px) saturate(130%);
   border: 1px solid var(--vidro-borda);
   border-radius: 1.4vw;
   padding: 2.2vh 1.6vw;
@@ -212,19 +214,21 @@ body.tema-amo::before {
   order: 2;
   transform: scale(1.15) translateY(-2vh);
   border-color: var(--ouro);
-  animation: auraPos1 2.6s ease-in-out infinite;
+  box-shadow: 0 0 4vh rgba(245, 196, 81, 0.4), inset 0 1px 0 var(--vidro-brilho);
 }
 
 .podio__item--pos2 {
   order: 1;
   border-color: var(--prata);
-  box-shadow: 0 0 1.8vh rgba(199, 205, 214, 0.22), inset 0 1px 0 var(--vidro-brilho);
+  border-width: 2px;
+  box-shadow: 0 0 2.4vh rgba(199, 205, 214, 0.35), inset 0 1px 0 var(--vidro-brilho);
 }
 
 .podio__item--pos3 {
   order: 3;
   border-color: var(--bronze);
-  box-shadow: 0 0 1.8vh rgba(217, 154, 99, 0.2), inset 0 1px 0 var(--vidro-brilho);
+  border-width: 2px;
+  box-shadow: 0 0 2.4vh rgba(217, 154, 99, 0.32), inset 0 1px 0 var(--vidro-brilho);
 }
 
 .podio__item--pos1::after {
@@ -235,13 +239,9 @@ body.tema-amo::before {
   background: radial-gradient(closest-side, rgba(245, 196, 81, 0.55), transparent 72%);
   filter: blur(1.2vw);
   z-index: -1;
+  will-change: transform, opacity;
   animation: auraGlow 2.6s ease-in-out infinite;
   pointer-events: none;
-}
-
-@keyframes auraPos1 {
-  0%, 100% { box-shadow: 0 0 3vh rgba(245, 196, 81, 0.3), inset 0 1px 0 var(--vidro-brilho); }
-  50% { box-shadow: 0 0 6vh rgba(245, 196, 81, 0.55), inset 0 1px 0 var(--vidro-brilho); }
 }
 
 @keyframes auraGlow {
@@ -262,7 +262,13 @@ body.tema-amo::before {
 
 .podio__posicao { font-size: 1vw; color: var(--texto-sub); font-weight: 700; letter-spacing: 0.04em; }
 .podio__nome { font-family: var(--fonte-display); font-size: 1.7vw; font-weight: 700; margin: 0.5vh 0; text-align: center; }
-.podio__metrica { font-family: var(--fonte-display); font-size: 2.2vw; font-weight: 800; color: var(--acento); }
+.podio__metrica {
+  font-family: var(--fonte-display);
+  font-size: 2.2vw;
+  font-weight: 800;
+  color: var(--acento);
+  text-shadow: 0 0 1.6vh var(--acento-brilho);
+}
 
 .podio__secundarias {
   display: flex;
@@ -302,6 +308,7 @@ body.tema-amo::before {
   display: flex;
   flex-direction: column;
   gap: 0.7vh;
+  will-change: scroll-position;
   -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
   mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
 }
@@ -318,8 +325,8 @@ body.tema-amo::before {
   min-height: 3.4rem;
   flex-shrink: 0;
   background: var(--vidro-bg);
-  backdrop-filter: blur(20px) saturate(160%);
-  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  backdrop-filter: blur(10px) saturate(120%);
+  -webkit-backdrop-filter: blur(10px) saturate(120%);
   border: 1px solid var(--vidro-borda);
   border-radius: 0.9vw;
   padding: 1.1vh 1.3vw;
@@ -355,6 +362,7 @@ body.tema-amo::before {
   font-size: 1.4vw;
   font-weight: 700;
   color: var(--acento);
+  text-shadow: 0 0 1vh var(--acento-brilho);
   white-space: nowrap;
 }
 
