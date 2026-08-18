@@ -79,3 +79,55 @@ function acaoLogin(usuario, senha) {
   var valido = validarCredencial(usuario, senha);
   return valido ? { ok: true } : { ok: false, erro: 'Credenciais inválidas' };
 }
+
+function acaoRanking(setor, periodo) {
+  var config = lerConfigAtual();
+  var slide = encontrarSlide(config, setor, periodo);
+  if (!slide) {
+    return { ok: false, erro: 'Nenhum slide configurado para ' + setor + '/' + periodo };
+  }
+  var planilha = getPlanilha();
+  var abaVendas = planilha.getSheetByName(ABA_VENDAS);
+  var pessoas = lerRankingVendas(abaVendas, slide);
+  var ranking = montarRanking(pessoas, slide.ordenarPor, slide.direcao);
+  var abaEquipe = planilha.getSheetByName(ABA_EQUIPE);
+  var linhasEquipe = abaEquipe.getDataRange().getValues().slice(1);
+  var mapaFotos = montarMapaFotos(linhasEquipe);
+  var rankingComFotos = anexarFotos(ranking, mapaFotos);
+  var dividido = dividirPodioEResto(rankingComFotos, config.qtdLista);
+  return {
+    ok: true,
+    setor: setor,
+    periodo: periodo,
+    rotulo: lerRotulo(abaVendas, slide.rotuloCelulas),
+    atualizadoEm: new Date().toISOString(),
+    podio: dividido.podio,
+    resto: dividido.resto
+  };
+}
+
+function encontrarSlide(config, setor, periodo) {
+  var slides = config.slides || [];
+  for (var i = 0; i < slides.length; i++) {
+    if (slides[i].setor === setor && slides[i].periodo === periodo) {
+      return slides[i];
+    }
+  }
+  return null;
+}
+
+function lerRankingVendas(aba, slide) {
+  var ultimaLinha = aba.getLastRow();
+  if (ultimaLinha < slide.linhaInicial) return [];
+  var intervalo = slide.colunas.nome + slide.linhaInicial + ':' + slide.colunas.contratos + ultimaLinha;
+  var valores = aba.getRange(intervalo).getValues();
+  return montarPessoasDeValores(valores);
+}
+
+function lerRotulo(aba, celulas) {
+  if (!celulas || celulas.length === 0) return '';
+  var partes = celulas.map(function (celula) {
+    return aba.getRange(celula).getDisplayValue();
+  });
+  return partes.join(' a ');
+}
