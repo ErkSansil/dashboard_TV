@@ -14,6 +14,7 @@ function atualizarConfig(callback) {
       if (dados.ok) {
         ESTADO.config = dados.config;
         aplicarTema(ESTADO.config.tema);
+        aplicarEstiloFundo(ESTADO.config);
         aplicarEscalaLista(ESTADO.config.escalaLista);
         aplicarAlturaPodio(ESTADO.config.alturaPodioVh);
       }
@@ -112,11 +113,29 @@ function agendarAvancoFallback(slide) {
   ESTADO.timerRotacao = setTimeout(avancarSlide, slide.duracaoSegundos * 1000);
 }
 
+var TEMAS_COM_CLASSE = ['claro', 'amo', 'aurora', 'sunset', 'oceano', 'platina', 'fogo', 'meianoite'];
+
 function aplicarTema(tema) {
-  document.body.classList.remove('tema-claro', 'tema-amo');
-  if (tema === 'claro' || tema === 'amo') {
+  document.body.classList.remove.apply(
+    document.body.classList,
+    TEMAS_COM_CLASSE.map(function (t) { return 'tema-' + t; })
+  );
+  if (TEMAS_COM_CLASSE.indexOf(tema) !== -1) {
     document.body.classList.add('tema-' + tema);
   }
+}
+
+function aplicarEstiloFundo(config) {
+  var raiz = document.documentElement.style;
+  var blur = config && typeof config.fundoBlur === 'number' && config.fundoBlur >= 0 ? config.fundoBlur : 10;
+  raiz.setProperty('--fundo-blur', blur + 'px');
+  raiz.setProperty('--fundo-anim-estado', config && config.fundoAnimado === false ? 'paused' : 'running');
+  raiz.setProperty(
+    '--fundo-estilo-filtro',
+    config && config.fundoBrilho === 'brilhante'
+      ? 'saturate(1.7) brightness(1.25) contrast(1.08)'
+      : 'saturate(1) brightness(1)'
+  );
 }
 
 function renderizarVazio() {

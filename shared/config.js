@@ -1,8 +1,13 @@
 var METRICAS_DISPONIVEIS = ['aproveitamento', 'vendasImediato', 'contratos', 'extra1', 'extra2'];
+var TEMAS_DISPONIVEIS = ['escuro', 'claro', 'amo', 'aurora', 'sunset', 'oceano', 'platina', 'fogo', 'meianoite'];
+var ESTILOS_FUNDO = ['fosco', 'brilhante'];
 
 function configPadrao() {
   return {
     tema: 'escuro',
+    fundoAnimado: true,
+    fundoBlur: 10,
+    fundoBrilho: 'fosco',
     qtdLista: 7,
     velocidadeScroll: 22,
     duracaoFadeSegundos: 0.6,
@@ -98,8 +103,17 @@ function validarConfig(config) {
   if (!Array.isArray(config.nomesExcluidos)) {
     erros.push('nomesExcluidos precisa ser uma lista');
   }
-  if (['claro', 'escuro', 'amo'].indexOf(config.tema) === -1) {
-    erros.push('tema precisa ser "claro", "escuro" ou "amo"');
+  if (TEMAS_DISPONIVEIS.indexOf(config.tema) === -1) {
+    erros.push('tema precisa ser um dos: ' + TEMAS_DISPONIVEIS.join(', '));
+  }
+  if (typeof config.fundoAnimado !== 'boolean') {
+    erros.push('fundoAnimado precisa ser true ou false');
+  }
+  if (typeof config.fundoBlur !== 'number' || config.fundoBlur < 0) {
+    erros.push('fundoBlur precisa ser um número maior ou igual a 0');
+  }
+  if (ESTILOS_FUNDO.indexOf(config.fundoBrilho) === -1) {
+    erros.push('fundoBrilho precisa ser "fosco" ou "brilhante"');
   }
   if (!Array.isArray(config.metricasVisiveis) || config.metricasVisiveis.length === 0) {
     erros.push('metricasVisiveis precisa ser uma lista com pelo menos 1 item');
@@ -114,5 +128,10 @@ function validarConfig(config) {
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { configPadrao: configPadrao, validarConfig: validarConfig };
+  module.exports = {
+    configPadrao: configPadrao,
+    validarConfig: validarConfig,
+    TEMAS_DISPONIVEIS: TEMAS_DISPONIVEIS,
+    ESTILOS_FUNDO: ESTILOS_FUNDO
+  };
 }

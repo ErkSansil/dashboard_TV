@@ -25,11 +25,31 @@
     <aside class="painel-controles">
       <h1>Configuração do rodízio</h1>
       <div class="campo">
-        <label>Tema</label>
+        <label>Tema de fundo</label>
         <select id="campoTema">
-          <option value="escuro">Escuro</option>
+          <option value="escuro">Escuro (neutro, sem animação)</option>
           <option value="claro">Claro</option>
-          <option value="amo">AMO</option>
+          <option value="amo">AMO (rosa e azul)</option>
+          <option value="aurora">Aurora (verde e turquesa)</option>
+          <option value="sunset">Pôr do Sol (laranja e rosa)</option>
+          <option value="oceano">Oceano (azul e ciano)</option>
+          <option value="platina">Platina (prata, premium)</option>
+          <option value="fogo">Fogo (vermelho e laranja)</option>
+          <option value="meianoite">Meia-noite (azul escuro, sutil)</option>
+        </select>
+      </div>
+      <div class="campo">
+        <label class="campo-metricas__item"><input type="checkbox" id="campoFundoAnimado" /> Fundo se mexendo (animado)</label>
+      </div>
+      <div class="campo">
+        <label>Desfoque do fundo (px, 0 = nítido/definido)</label>
+        <input type="number" id="campoFundoBlur" min="0" step="1" />
+      </div>
+      <div class="campo">
+        <label>Estilo do fundo</label>
+        <select id="campoFundoBrilho">
+          <option value="fosco">Fosco (suave)</option>
+          <option value="brilhante">Brilhante (mais vívido)</option>
         </select>
       </div>
       <div class="campo">

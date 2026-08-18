@@ -17,6 +17,17 @@
   --fonte-display: 'Sora', 'Segoe UI', Arial, sans-serif;
   --lista-escala: 1;
   --podio-altura: 34;
+  --fundo-blob1: rgba(236, 72, 153, 0.5);
+  --fundo-blob2: rgba(56, 189, 248, 0.5);
+  --fundo-blob3: rgba(59, 130, 246, 0.4);
+  --fundo-blob4: rgba(236, 72, 153, 0.35);
+  --fundo-base1: #0c0a16;
+  --fundo-base2: #130f1f;
+  --fundo-base3: #08060f;
+  --fundo-blur: 10px;
+  --fundo-anim-duracao: 14s;
+  --fundo-anim-estado: running;
+  --fundo-estilo-filtro: saturate(1) brightness(1);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -54,25 +65,165 @@ body.tema-amo {
   --vidro-borda: rgba(196, 165, 255, 0.2);
   --vidro-brilho: rgba(220, 200, 255, 0.16);
   --vidro-sombra: rgba(6, 3, 14, 0.6);
+  --fundo-blob1: rgba(236, 72, 153, 0.55);
+  --fundo-blob2: rgba(56, 189, 248, 0.5);
+  --fundo-blob3: rgba(59, 130, 246, 0.42);
+  --fundo-blob4: rgba(236, 72, 153, 0.38);
+  --fundo-base1: #0c0a16;
+  --fundo-base2: #130f1f;
+  --fundo-base3: #08060f;
 }
 
-body.tema-amo::before {
+body.tema-aurora {
+  --bg: #071612;
+  --bg-elevado: rgba(15, 46, 38, 0.5);
+  --texto: #f0fdf9;
+  --texto-sub: #9fd8c9;
+  --borda: rgba(45, 212, 191, 0.22);
+  --acento: #34d399;
+  --acento-brilho: rgba(52, 211, 153, 0.45);
+  --vidro-bg: rgba(255, 255, 255, 0.05);
+  --vidro-borda: rgba(94, 234, 212, 0.2);
+  --vidro-brilho: rgba(167, 243, 208, 0.16);
+  --vidro-sombra: rgba(3, 14, 11, 0.6);
+  --fundo-blob1: rgba(52, 211, 153, 0.5);
+  --fundo-blob2: rgba(45, 212, 191, 0.48);
+  --fundo-blob3: rgba(56, 189, 248, 0.35);
+  --fundo-blob4: rgba(110, 231, 183, 0.35);
+  --fundo-base1: #071612;
+  --fundo-base2: #0b241d;
+  --fundo-base3: #050f0c;
+}
+
+body.tema-sunset {
+  --bg: #170a0c;
+  --bg-elevado: rgba(46, 20, 22, 0.5);
+  --texto: #fff5f0;
+  --texto-sub: #e0ac9a;
+  --borda: rgba(251, 146, 60, 0.22);
+  --acento: #fb7185;
+  --acento-brilho: rgba(251, 113, 133, 0.45);
+  --vidro-bg: rgba(255, 255, 255, 0.05);
+  --vidro-borda: rgba(251, 191, 133, 0.2);
+  --vidro-brilho: rgba(254, 215, 170, 0.16);
+  --vidro-sombra: rgba(15, 5, 5, 0.6);
+  --fundo-blob1: rgba(251, 146, 60, 0.5);
+  --fundo-blob2: rgba(244, 63, 94, 0.42);
+  --fundo-blob3: rgba(251, 191, 36, 0.38);
+  --fundo-blob4: rgba(251, 113, 133, 0.35);
+  --fundo-base1: #170a0c;
+  --fundo-base2: #241009;
+  --fundo-base3: #0d0506;
+}
+
+body.tema-oceano {
+  --bg: #071019;
+  --bg-elevado: rgba(15, 32, 46, 0.5);
+  --texto: #eef7ff;
+  --texto-sub: #9dc3dd;
+  --borda: rgba(56, 189, 248, 0.22);
+  --acento: #38bdf8;
+  --acento-brilho: rgba(56, 189, 248, 0.45);
+  --vidro-bg: rgba(255, 255, 255, 0.05);
+  --vidro-borda: rgba(125, 211, 252, 0.2);
+  --vidro-brilho: rgba(186, 230, 253, 0.16);
+  --vidro-sombra: rgba(3, 9, 15, 0.6);
+  --fundo-blob1: rgba(14, 165, 233, 0.48);
+  --fundo-blob2: rgba(34, 211, 238, 0.4);
+  --fundo-blob3: rgba(20, 184, 166, 0.35);
+  --fundo-blob4: rgba(59, 130, 246, 0.32);
+  --fundo-base1: #071019;
+  --fundo-base2: #0b1e2e;
+  --fundo-base3: #040a11;
+}
+
+body.tema-platina {
+  --bg: #101114;
+  --bg-elevado: rgba(30, 32, 38, 0.5);
+  --texto: #f3f4f6;
+  --texto-sub: #a2a6b0;
+  --borda: rgba(203, 213, 225, 0.18);
+  --acento: #93c5fd;
+  --acento-brilho: rgba(147, 197, 253, 0.4);
+  --vidro-bg: rgba(255, 255, 255, 0.06);
+  --vidro-borda: rgba(226, 232, 240, 0.16);
+  --vidro-brilho: rgba(255, 255, 255, 0.14);
+  --vidro-sombra: rgba(0, 0, 0, 0.5);
+  --fundo-blob1: rgba(203, 213, 225, 0.28);
+  --fundo-blob2: rgba(148, 163, 184, 0.24);
+  --fundo-blob3: rgba(226, 232, 240, 0.2);
+  --fundo-blob4: rgba(100, 116, 139, 0.2);
+  --fundo-base1: #101114;
+  --fundo-base2: #16181d;
+  --fundo-base3: #0a0b0d;
+}
+
+body.tema-fogo {
+  --bg: #170a05;
+  --bg-elevado: rgba(46, 20, 10, 0.5);
+  --texto: #fff7ed;
+  --texto-sub: #e0b088;
+  --borda: rgba(249, 115, 22, 0.24);
+  --acento: #fb923c;
+  --acento-brilho: rgba(251, 146, 60, 0.45);
+  --vidro-bg: rgba(255, 255, 255, 0.05);
+  --vidro-borda: rgba(253, 186, 116, 0.2);
+  --vidro-brilho: rgba(254, 215, 170, 0.16);
+  --vidro-sombra: rgba(15, 5, 2, 0.6);
+  --fundo-blob1: rgba(239, 68, 68, 0.5);
+  --fundo-blob2: rgba(249, 115, 22, 0.48);
+  --fundo-blob3: rgba(245, 196, 81, 0.4);
+  --fundo-blob4: rgba(220, 38, 38, 0.35);
+  --fundo-base1: #170a05;
+  --fundo-base2: #240f06;
+  --fundo-base3: #0d0503;
+}
+
+body.tema-meianoite {
+  --bg: #06070f;
+  --bg-elevado: rgba(15, 18, 34, 0.5);
+  --texto: #eef0fb;
+  --texto-sub: #8f96b8;
+  --borda: rgba(99, 102, 241, 0.2);
+  --acento: #818cf8;
+  --acento-brilho: rgba(129, 140, 248, 0.4);
+  --vidro-bg: rgba(255, 255, 255, 0.05);
+  --vidro-borda: rgba(165, 180, 252, 0.18);
+  --vidro-brilho: rgba(199, 210, 254, 0.14);
+  --vidro-sombra: rgba(2, 2, 8, 0.65);
+  --fundo-blob1: rgba(99, 102, 241, 0.32);
+  --fundo-blob2: rgba(59, 130, 246, 0.28);
+  --fundo-blob3: rgba(76, 29, 149, 0.28);
+  --fundo-blob4: rgba(30, 64, 175, 0.24);
+  --fundo-base1: #06070f;
+  --fundo-base2: #0a0c1c;
+  --fundo-base3: #030309;
+}
+
+body.tema-amo::before,
+body.tema-aurora::before,
+body.tema-sunset::before,
+body.tema-oceano::before,
+body.tema-platina::before,
+body.tema-fogo::before,
+body.tema-meianoite::before {
   content: '';
   position: fixed;
   inset: -30%;
   z-index: -1;
   background:
-    radial-gradient(circle at 15% 20%, rgba(236, 72, 153, 0.55), transparent 42%),
-    radial-gradient(circle at 85% 15%, rgba(56, 189, 248, 0.5), transparent 44%),
-    radial-gradient(circle at 30% 85%, rgba(59, 130, 246, 0.42), transparent 46%),
-    radial-gradient(circle at 85% 85%, rgba(236, 72, 153, 0.38), transparent 46%),
-    linear-gradient(160deg, #0c0a16 0%, #130f1f 50%, #08060f 100%);
-  filter: blur(10px);
+    radial-gradient(circle at 15% 20%, var(--fundo-blob1), transparent 42%),
+    radial-gradient(circle at 85% 15%, var(--fundo-blob2), transparent 44%),
+    radial-gradient(circle at 30% 85%, var(--fundo-blob3), transparent 46%),
+    radial-gradient(circle at 85% 85%, var(--fundo-blob4), transparent 46%),
+    linear-gradient(160deg, var(--fundo-base1) 0%, var(--fundo-base2) 50%, var(--fundo-base3) 100%);
+  filter: blur(var(--fundo-blur, 10px)) var(--fundo-estilo-filtro, saturate(1) brightness(1));
   will-change: transform;
-  animation: liquidoAmo 14s ease-in-out infinite alternate;
+  animation: fundoMovimento var(--fundo-anim-duracao, 14s) ease-in-out infinite alternate;
+  animation-play-state: var(--fundo-anim-estado, running);
 }
 
-@keyframes liquidoAmo {
+@keyframes fundoMovimento {
   0% { transform: scale(1) rotate(0deg) translate(0, 0); }
   50% { transform: scale(1.18) rotate(6deg) translate(-4%, 3%); }
   100% { transform: scale(1.08) rotate(-6deg) translate(4%, -3%); }

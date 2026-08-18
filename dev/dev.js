@@ -42,6 +42,9 @@ var METRICAS_CAMPO = [
 
 function preencherFormulario(config) {
   document.getElementById('campoTema').value = config.tema;
+  document.getElementById('campoFundoAnimado').checked = config.fundoAnimado !== false;
+  document.getElementById('campoFundoBlur').value = config.fundoBlur;
+  document.getElementById('campoFundoBrilho').value = config.fundoBrilho;
   document.getElementById('campoQtdLista').value = config.qtdLista;
   document.getElementById('campoVelocidadeScroll').value = config.velocidadeScroll;
   document.getElementById('campoDuracaoFade').value = config.duracaoFadeSegundos;
@@ -112,6 +115,9 @@ function preencherFormulario(config) {
 function lerFormularioParaConfig() {
   var config = JSON.parse(JSON.stringify(CONFIG_ATUAL));
   config.tema = document.getElementById('campoTema').value;
+  config.fundoAnimado = document.getElementById('campoFundoAnimado').checked;
+  config.fundoBlur = Number(document.getElementById('campoFundoBlur').value);
+  config.fundoBrilho = document.getElementById('campoFundoBrilho').value;
   config.qtdLista = Number(document.getElementById('campoQtdLista').value);
   config.velocidadeScroll = Number(document.getElementById('campoVelocidadeScroll').value);
   config.duracaoFadeSegundos = Number(document.getElementById('campoDuracaoFade').value);

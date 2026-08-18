@@ -217,3 +217,54 @@ test('validarConfig rejeita alturaPodioVh fora do intervalo 0-100', () => {
   config.alturaPodioVh = 150;
   assert.equal(validarConfig(config).valido, false);
 });
+
+test('configPadrao vem com fundoAnimado true, fundoBlur 10 e fundoBrilho fosco', () => {
+  const config = configPadrao();
+  assert.equal(config.fundoAnimado, true);
+  assert.equal(config.fundoBlur, 10);
+  assert.equal(config.fundoBrilho, 'fosco');
+});
+
+test('validarConfig aceita todos os temas de fundo personalizados', () => {
+  const config = configPadrao();
+  ['escuro', 'claro', 'amo', 'aurora', 'sunset', 'oceano', 'platina', 'fogo', 'meianoite'].forEach((tema) => {
+    config.tema = tema;
+    assert.equal(validarConfig(config).valido, true, tema);
+  });
+});
+
+test('validarConfig rejeita fundoAnimado que não seja booleano', () => {
+  const config = configPadrao();
+  config.fundoAnimado = 'sim';
+  const resultado = validarConfig(config);
+  assert.equal(resultado.valido, false);
+  assert.ok(resultado.erros.some((e) => e.includes('fundoAnimado')));
+});
+
+test('validarConfig rejeita fundoBlur negativo', () => {
+  const config = configPadrao();
+  config.fundoBlur = -1;
+  const resultado = validarConfig(config);
+  assert.equal(resultado.valido, false);
+  assert.ok(resultado.erros.some((e) => e.includes('fundoBlur')));
+});
+
+test('validarConfig aceita fundoBlur igual a 0 (sem desfoque)', () => {
+  const config = configPadrao();
+  config.fundoBlur = 0;
+  assert.equal(validarConfig(config).valido, true);
+});
+
+test('validarConfig rejeita fundoBrilho desconhecido', () => {
+  const config = configPadrao();
+  config.fundoBrilho = 'metalico';
+  const resultado = validarConfig(config);
+  assert.equal(resultado.valido, false);
+  assert.ok(resultado.erros.some((e) => e.includes('fundoBrilho')));
+});
+
+test('validarConfig aceita fundoBrilho brilhante', () => {
+  const config = configPadrao();
+  config.fundoBrilho = 'brilhante';
+  assert.equal(validarConfig(config).valido, true);
+});
