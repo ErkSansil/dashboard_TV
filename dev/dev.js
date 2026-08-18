@@ -108,6 +108,11 @@ function lerFormularioParaConfig() {
   return config;
 }
 
+function recarregarPreview() {
+  var iframe = document.querySelector('.preview iframe');
+  iframe.src = iframe.src;
+}
+
 document.getElementById('botaoSalvar').addEventListener('click', function () {
   var config = lerFormularioParaConfig();
   var validacao = validarConfig(config);
@@ -129,6 +134,7 @@ document.getElementById('botaoSalvar').addEventListener('click', function () {
       if (dados.ok) {
         CONFIG_ATUAL = config;
         mensagem.textContent = 'Configuração salva. As TVs atualizam em até 15 segundos.';
+        recarregarPreview();
       } else {
         mensagem.textContent = 'Erro ao salvar: ' + dados.erro;
       }
