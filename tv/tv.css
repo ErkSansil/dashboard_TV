@@ -15,6 +15,7 @@
   --vidro-sombra: rgba(0, 0, 0, 0.35);
   --fonte: 'Inter', 'Segoe UI', Arial, sans-serif;
   --fonte-display: 'Sora', 'Segoe UI', Arial, sans-serif;
+  --lista-escala: 1;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -334,25 +335,25 @@ body.tema-amo::before {
   position: relative;
   overflow: hidden;
   display: grid;
-  grid-template-columns: 3vw 4vw 1fr auto;
+  grid-template-columns: calc(3.4vw * var(--lista-escala, 1)) calc(4.6vw * var(--lista-escala, 1)) 1fr auto;
   align-items: center;
-  gap: 1vw;
-  min-height: 3.4rem;
+  gap: 1.1vw;
+  min-height: calc(3.9rem * var(--lista-escala, 1));
   flex-shrink: 0;
   background: var(--vidro-bg);
   backdrop-filter: blur(10px) saturate(120%);
   -webkit-backdrop-filter: blur(10px) saturate(120%);
   border: 1px solid var(--vidro-borda);
   border-radius: 0.9vw;
-  padding: 1.1vh 1.3vw;
+  padding: calc(1.1vh * var(--lista-escala, 1)) 1.3vw;
   box-shadow: inset 0 1px 0 var(--vidro-brilho);
 }
 
-.lista__posicao { font-weight: 700; color: var(--texto-sub); }
+.lista__posicao { font-size: calc(1.15vw * var(--lista-escala, 1)); font-weight: 700; color: var(--texto-sub); }
 
 .lista__foto {
-  width: 3vw;
-  height: 3vw;
+  width: calc(3.4vw * var(--lista-escala, 1));
+  height: calc(3.4vw * var(--lista-escala, 1));
   border-radius: 50%;
   background-size: cover;
   background-position: center;
@@ -360,7 +361,7 @@ body.tema-amo::before {
   border: 1px solid var(--vidro-brilho);
 }
 
-.lista__nome { font-size: 1.3vw; font-weight: 600; }
+.lista__nome { font-size: calc(1.55vw * var(--lista-escala, 1)); font-weight: 600; }
 
 .lista__metricas {
   display: flex;
@@ -374,7 +375,7 @@ body.tema-amo::before {
   align-items: baseline;
   gap: 0.4vw;
   font-family: var(--fonte-display);
-  font-size: 1.4vw;
+  font-size: calc(1.65vw * var(--lista-escala, 1));
   font-weight: 700;
   color: var(--acento);
   text-shadow: 0 0 1vh var(--acento-brilho);
@@ -383,7 +384,7 @@ body.tema-amo::before {
 
 .lista__metrica-rotulo {
   font-family: var(--fonte);
-  font-size: 0.75vw;
+  font-size: calc(0.85vw * var(--lista-escala, 1));
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;

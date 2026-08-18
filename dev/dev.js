@@ -45,6 +45,8 @@ function preencherFormulario(config) {
   document.getElementById('campoQtdLista').value = config.qtdLista;
   document.getElementById('campoVelocidadeScroll').value = config.velocidadeScroll;
   document.getElementById('campoDuracaoFade').value = config.duracaoFadeSegundos;
+  document.getElementById('campoEscalaLista').value = config.escalaLista;
+  document.getElementById('campoNomesExcluidos').value = (config.nomesExcluidos || []).join('\n');
   document.getElementById('campoRotuloExtra1').value = config.rotuloExtra1 || '';
   document.getElementById('campoRotuloExtra2').value = config.rotuloExtra2 || '';
 
@@ -112,6 +114,11 @@ function lerFormularioParaConfig() {
   config.qtdLista = Number(document.getElementById('campoQtdLista').value);
   config.velocidadeScroll = Number(document.getElementById('campoVelocidadeScroll').value);
   config.duracaoFadeSegundos = Number(document.getElementById('campoDuracaoFade').value);
+  config.escalaLista = Number(document.getElementById('campoEscalaLista').value);
+  config.nomesExcluidos = document.getElementById('campoNomesExcluidos').value
+    .split('\n')
+    .map(function (linha) { return linha.trim(); })
+    .filter(function (linha) { return linha.length > 0; });
 
   var fixadoValor = document.getElementById('campoFixado').value;
   config.fixado = fixadoValor ? { setor: fixadoValor.split('|')[0], periodo: fixadoValor.split('|')[1] } : null;

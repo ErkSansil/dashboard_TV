@@ -4,6 +4,7 @@ const assert = require('node:assert/strict');
 const {
   normalizeVendaRow,
   montarPessoasDeValores,
+  filtrarNomesExcluidos,
   sortRanking,
   buildRankingComPosicoes,
   montarRanking,
@@ -124,4 +125,22 @@ test('anexarFotos retorna string vazia quando não encontra a pessoa', () => {
   const ranking = [{ nome: 'Sem Foto', posicao: 1 }];
   const comFoto = anexarFotos(ranking, {});
   assert.equal(comFoto[0].foto, '');
+});
+
+test('filtrarNomesExcluidos remove pessoas cujo nome está na lista de exclusão', () => {
+  const pessoas = [{ nome: 'Alice' }, { nome: 'Miranda' }, { nome: 'Fernanda' }];
+  const filtradas = filtrarNomesExcluidos(pessoas, ['Miranda']);
+  assert.deepEqual(filtradas.map((p) => p.nome), ['Alice', 'Fernanda']);
+});
+
+test('filtrarNomesExcluidos ignora maiúsculas/espaços ao comparar', () => {
+  const pessoas = [{ nome: ' miranda ' }, { nome: 'Alice' }];
+  const filtradas = filtrarNomesExcluidos(pessoas, ['Miranda']);
+  assert.deepEqual(filtradas.map((p) => p.nome), ['Alice']);
+});
+
+test('filtrarNomesExcluidos retorna a lista original quando não há exclusões', () => {
+  const pessoas = [{ nome: 'Alice' }, { nome: 'Fernanda' }];
+  assert.deepEqual(filtrarNomesExcluidos(pessoas, []), pessoas);
+  assert.deepEqual(filtrarNomesExcluidos(pessoas, null), pessoas);
 });

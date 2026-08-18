@@ -6,6 +6,8 @@ function configPadrao() {
     qtdLista: 7,
     velocidadeScroll: 22,
     duracaoFadeSegundos: 0.6,
+    escalaLista: 100,
+    nomesExcluidos: [],
     metricasVisiveis: ['aproveitamento', 'vendasImediato', 'contratos'],
     rotuloExtra1: '',
     rotuloExtra2: '',
@@ -85,6 +87,12 @@ function validarConfig(config) {
   }
   if (typeof config.duracaoFadeSegundos !== 'number' || config.duracaoFadeSegundos < 0) {
     erros.push('duracaoFadeSegundos precisa ser um número maior ou igual a 0');
+  }
+  if (typeof config.escalaLista !== 'number' || config.escalaLista <= 0) {
+    erros.push('escalaLista precisa ser um número maior que 0');
+  }
+  if (!Array.isArray(config.nomesExcluidos)) {
+    erros.push('nomesExcluidos precisa ser uma lista');
   }
   if (['claro', 'escuro', 'amo'].indexOf(config.tema) === -1) {
     erros.push('tema precisa ser "claro", "escuro" ou "amo"');

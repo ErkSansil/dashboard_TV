@@ -129,15 +129,17 @@ h1, h2 { font-family: var(--fonte-display); }
   font-size: 0.85rem !important;
   font-family: var(--fonte) !important;
 }
-.campo select, .campo input {
+.campo select, .campo input, .campo textarea {
   padding: 0.6rem 0.7rem;
   border-radius: 10px;
   border: 1px solid var(--borda);
   font-family: var(--fonte);
   font-size: 0.9rem;
   background: var(--bg-elevado);
+  color: var(--texto);
 }
-.campo select:focus, .campo input:focus {
+.campo textarea { resize: vertical; }
+.campo select:focus, .campo input:focus, .campo textarea:focus {
   outline: none;
   border-color: var(--acento);
   box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.15);

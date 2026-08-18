@@ -14,10 +14,16 @@ function atualizarConfig(callback) {
       if (dados.ok) {
         ESTADO.config = dados.config;
         aplicarTema(ESTADO.config.tema);
+        aplicarEscalaLista(ESTADO.config.escalaLista);
       }
       callback();
     })
     .catch(function () { callback(); });
+}
+
+function aplicarEscalaLista(escalaLista) {
+  var valor = typeof escalaLista === 'number' && escalaLista > 0 ? escalaLista / 100 : 1;
+  document.documentElement.style.setProperty('--lista-escala', String(valor));
 }
 
 function agendarRotacao() {

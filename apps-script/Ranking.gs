@@ -36,6 +36,14 @@ function montarPessoasDeValores(valoresLinhas) {
   return pessoas;
 }
 
+function filtrarNomesExcluidos(pessoas, nomesExcluidos) {
+  if (!nomesExcluidos || nomesExcluidos.length === 0) return pessoas;
+  var excluidos = nomesExcluidos.map(function (nome) { return normalizarChaveNome(nome); });
+  return pessoas.filter(function (pessoa) {
+    return excluidos.indexOf(normalizarChaveNome(pessoa.nome)) === -1;
+  });
+}
+
 function sortRanking(pessoas, ordenarPor, direcao) {
   var campo = ordenarPor || 'aproveitamento';
   var direcaoPadrao = campo === 'nome' ? 'asc' : 'desc';
@@ -105,6 +113,7 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     normalizeVendaRow: normalizeVendaRow,
     montarPessoasDeValores: montarPessoasDeValores,
+    filtrarNomesExcluidos: filtrarNomesExcluidos,
     sortRanking: sortRanking,
     buildRankingComPosicoes: buildRankingComPosicoes,
     montarRanking: montarRanking,

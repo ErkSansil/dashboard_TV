@@ -173,3 +173,32 @@ test('validarConfig rejeita duracaoFadeSegundos negativa', () => {
   assert.equal(resultado.valido, false);
   assert.ok(resultado.erros.some((e) => e.includes('duracaoFadeSegundos')));
 });
+
+test('configPadrao vem com escalaLista 100 e nomesExcluidos vazio', () => {
+  const config = configPadrao();
+  assert.equal(config.escalaLista, 100);
+  assert.deepEqual(config.nomesExcluidos, []);
+});
+
+test('validarConfig rejeita escalaLista zero ou negativa', () => {
+  const config = configPadrao();
+  config.escalaLista = 0;
+  const resultado = validarConfig(config);
+  assert.equal(resultado.valido, false);
+  assert.ok(resultado.erros.some((e) => e.includes('escalaLista')));
+});
+
+test('validarConfig aceita nomesExcluidos preenchido', () => {
+  const config = configPadrao();
+  config.nomesExcluidos = ['Miranda', 'Não enviar Fila'];
+  const resultado = validarConfig(config);
+  assert.equal(resultado.valido, true);
+});
+
+test('validarConfig rejeita nomesExcluidos que não seja uma lista', () => {
+  const config = configPadrao();
+  config.nomesExcluidos = 'Miranda';
+  const resultado = validarConfig(config);
+  assert.equal(resultado.valido, false);
+  assert.ok(resultado.erros.some((e) => e.includes('nomesExcluidos')));
+});

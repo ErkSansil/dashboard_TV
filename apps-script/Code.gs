@@ -90,6 +90,7 @@ function acaoRanking(setor, periodo) {
   var planilha = getPlanilha();
   var abaVendas = planilha.getSheetByName(ABA_VENDAS);
   var pessoas = lerRankingVendas(abaVendas, slide);
+  pessoas = filtrarNomesExcluidos(pessoas, config.nomesExcluidos);
   var ranking = montarRanking(pessoas, slide.ordenarPor, slide.direcao);
   var abaEquipe = planilha.getSheetByName(ABA_EQUIPE);
   var linhasEquipe = abaEquipe.getDataRange().getValues().slice(1);
