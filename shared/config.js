@@ -62,8 +62,8 @@ function validarConfig(config) {
   if (typeof config.qtdLista !== 'number' || config.qtdLista < 0) {
     erros.push('qtdLista precisa ser um número maior ou igual a 0');
   }
-  if (['claro', 'escuro'].indexOf(config.tema) === -1) {
-    erros.push('tema precisa ser "claro" ou "escuro"');
+  if (['claro', 'escuro', 'amo'].indexOf(config.tema) === -1) {
+    erros.push('tema precisa ser "claro", "escuro" ou "amo"');
   }
   return { valido: erros.length === 0, erros: erros };
 }

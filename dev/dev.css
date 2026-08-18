@@ -1,51 +1,180 @@
 :root {
-  --bg: #f5f6f8;
+  --bg: #f4f2f5;
   --bg-elevado: #ffffff;
-  --texto: #14171f;
-  --texto-sub: #5b6270;
-  --acento: #3b82f6;
-  --borda: #e2e5ea;
+  --texto: #1c1420;
+  --texto-sub: #766a72;
+  --acento: #ec4899;
+  --acento-escuro: #be185d;
+  --borda: #ece5ea;
   --erro: #dc2626;
-  --fonte: 'Segoe UI', Arial, sans-serif;
+  --sombra: 0 1.2rem 2.5rem rgba(157, 23, 77, 0.08);
+  --fonte: 'Inter', 'Segoe UI', Arial, sans-serif;
+  --fonte-display: 'Sora', 'Segoe UI', Arial, sans-serif;
 }
 
 * { box-sizing: border-box; }
 
 [hidden] { display: none !important; }
 
-body { margin: 0; font-family: var(--fonte); background: var(--bg); color: var(--texto); }
+body {
+  margin: 0;
+  font-family: var(--fonte);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(236, 72, 153, 0.08), transparent 40%),
+    var(--bg);
+  color: var(--texto);
+}
 
-.tela-login { height: 100vh; display: flex; align-items: center; justify-content: center; }
+h1, h2 { font-family: var(--fonte-display); }
+
+.tela-login {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
 .tela-login form {
   background: var(--bg-elevado);
   border: 1px solid var(--borda);
-  border-radius: 12px;
-  padding: 2rem;
-  width: 320px;
+  border-radius: 20px;
+  padding: 2.5rem;
+  width: 340px;
   display: flex;
   flex-direction: column;
-  gap: 0.8rem;
+  gap: 1rem;
+  box-shadow: var(--sombra);
 }
 
-.tela-login__logo { height: 40px; align-self: center; }
-.tela-login input, .tela-login button { padding: 0.6rem; border-radius: 8px; border: 1px solid var(--borda); font-size: 1rem; }
-.tela-login button { background: var(--acento); color: #fff; border: none; cursor: pointer; }
-.mensagem-erro { color: var(--erro); font-size: 0.85rem; min-height: 1em; }
+.tela-login__logo { height: 64px; align-self: center; margin-bottom: 0.5rem; }
+
+.tela-login h1 { font-size: 1.5rem; text-align: center; margin-bottom: 0.5rem; }
+
+.tela-login input, .tela-login button {
+  padding: 0.75rem 0.9rem;
+  border-radius: 10px;
+  border: 1px solid var(--borda);
+  font-size: 0.95rem;
+  font-family: var(--fonte);
+}
+
+.tela-login input:focus {
+  outline: none;
+  border-color: var(--acento);
+  box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.15);
+}
+
+.tela-login button {
+  background: linear-gradient(135deg, var(--acento), var(--acento-escuro));
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+  padding: 0.85rem;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.tela-login button:hover { transform: translateY(-1px); box-shadow: 0 0.6rem 1.2rem rgba(190, 24, 93, 0.25); }
+
+.mensagem-erro { color: var(--erro); font-size: 0.85rem; min-height: 1em; text-align: center; }
 .mensagem-status { color: var(--texto-sub); font-size: 0.85rem; }
 
-.tela-config { display: grid; grid-template-columns: 380px 1fr; height: 100vh; }
+.tela-config {
+  display: grid;
+  grid-template-columns: 400px 1fr;
+  height: 100vh;
+}
 
-.painel-controles { overflow-y: auto; padding: 1.5rem; border-right: 1px solid var(--borda); background: var(--bg-elevado); }
+.painel-controles {
+  overflow-y: auto;
+  padding: 2rem;
+  border-right: 1px solid var(--borda);
+  background: var(--bg-elevado);
+}
 
-.campo { margin-bottom: 1rem; display: flex; flex-direction: column; gap: 0.3rem; }
-.campo select, .campo input { padding: 0.4rem; border-radius: 6px; border: 1px solid var(--borda); }
+.painel-controles h1 {
+  font-size: 1.4rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--borda);
+}
 
-.campo-slide { border: 1px solid var(--borda); border-radius: 8px; padding: 0.8rem; margin-bottom: 1rem; display: flex; flex-direction: column; gap: 0.5rem; }
-.campo-slide label { display: flex; flex-direction: column; gap: 0.2rem; font-size: 0.85rem; }
-.campo-slide input, .campo-slide select { padding: 0.35rem; border-radius: 6px; border: 1px solid var(--borda); }
+.campo { margin-bottom: 1.2rem; display: flex; flex-direction: column; gap: 0.4rem; }
+.campo label { font-size: 0.85rem; font-weight: 600; color: var(--texto-sub); }
+.campo select, .campo input {
+  padding: 0.6rem 0.7rem;
+  border-radius: 10px;
+  border: 1px solid var(--borda);
+  font-family: var(--fonte);
+  font-size: 0.9rem;
+  background: var(--bg-elevado);
+}
+.campo select:focus, .campo input:focus {
+  outline: none;
+  border-color: var(--acento);
+  box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.15);
+}
 
-#botaoSalvar { width: 100%; padding: 0.7rem; background: var(--acento); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; }
+.campo-slide {
+  border: 1px solid var(--borda);
+  border-radius: 14px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  background: var(--bg-elevado);
+  box-shadow: 0 0.4rem 1rem rgba(28, 20, 32, 0.04);
+  transition: box-shadow 0.15s ease;
+}
+.campo-slide:hover { box-shadow: 0 0.6rem 1.4rem rgba(157, 23, 77, 0.1); }
 
-.preview { padding: 1.5rem; display: flex; flex-direction: column; }
-.preview iframe { flex: 1; border: 1px solid var(--borda); border-radius: 12px; margin-top: 1rem; }
+.campo-slide legend {
+  font-family: var(--fonte-display);
+  font-weight: 700;
+  padding: 0 0.3rem;
+  color: var(--acento-escuro);
+  text-transform: capitalize;
+}
+
+.campo-slide label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.8rem; color: var(--texto-sub); font-weight: 500; }
+.campo-slide label:has(input[type="checkbox"]) { flex-direction: row; align-items: center; gap: 0.5rem; }
+.campo-slide input, .campo-slide select {
+  padding: 0.45rem 0.6rem;
+  border-radius: 8px;
+  border: 1px solid var(--borda);
+  font-family: var(--fonte);
+}
+
+#botaoSalvar {
+  width: 100%;
+  padding: 0.9rem;
+  background: linear-gradient(135deg, var(--acento), var(--acento-escuro));
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.95rem;
+  margin-top: 0.5rem;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+#botaoSalvar:hover { transform: translateY(-1px); box-shadow: 0 0.7rem 1.4rem rgba(190, 24, 93, 0.25); }
+
+.preview {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(165deg, #fbeef4, var(--bg));
+}
+
+.preview h2 { font-size: 1.1rem; color: var(--texto-sub); font-weight: 600; }
+
+.preview iframe {
+  flex: 1;
+  border: 1px solid var(--borda);
+  border-radius: 20px;
+  margin-top: 1.2rem;
+  box-shadow: var(--sombra);
+  background: #0b0d12;
+}

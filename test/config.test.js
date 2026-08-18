@@ -44,3 +44,18 @@ test('validarConfig aceita slide inativo sem colunas preenchidas', () => {
   const resultado = validarConfig(config);
   assert.equal(resultado.valido, true);
 });
+
+test('validarConfig aceita o tema "amo"', () => {
+  const config = configPadrao();
+  config.tema = 'amo';
+  const resultado = validarConfig(config);
+  assert.equal(resultado.valido, true);
+});
+
+test('validarConfig rejeita tema desconhecido', () => {
+  const config = configPadrao();
+  config.tema = 'neon';
+  const resultado = validarConfig(config);
+  assert.equal(resultado.valido, false);
+  assert.ok(resultado.erros.some((e) => e.includes('tema')));
+});

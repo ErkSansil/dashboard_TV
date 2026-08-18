@@ -50,7 +50,10 @@ function mostrarSlideAtual() {
 }
 
 function aplicarTema(tema) {
-  document.body.classList.toggle('tema-claro', tema === 'claro');
+  document.body.classList.remove('tema-claro', 'tema-amo');
+  if (tema === 'claro' || tema === 'amo') {
+    document.body.classList.add('tema-' + tema);
+  }
 }
 
 function renderizarVazio() {
