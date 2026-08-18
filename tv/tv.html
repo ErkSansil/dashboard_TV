@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <title>Dashboard Comercial AMO</title>
+  <link rel="icon" href="../assets/icone-amo.png" />
+  <link rel="stylesheet" href="tv.css" />
+</head>
+<body>
+  <div class="tela">
+    <header class="cabecalho">
+      <img class="cabecalho__logo" src="../assets/logo-amo.png" alt="AMO" />
+      <div class="cabecalho__titulo">
+        <span class="cabecalho__setor" id="rotuloSetor">Vendas</span>
+        <span class="cabecalho__periodo" id="rotuloPeriodo">Hoje</span>
+      </div>
+    </header>
+    <main class="conteudo">
+      <section class="podio" id="podio"></section>
+      <section class="lista" id="lista"></section>
+    </main>
+  </div>
+
+  <script src="../shared/percent.js"></script>
+  <script src="../shared/drive.js"></script>
+  <script src="../shared/ranking.js"></script>
+  <script src="../shared/config.js"></script>
+  <script src="../shared/rotation.js"></script>
+  <script src="../shared/apiConfig.js"></script>
+  <script src="tv.js"></script>
+</body>
+</html>
