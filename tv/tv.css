@@ -73,11 +73,31 @@ body.tema-amo {
 }
 
 .cabecalho__logo {
-  height: 11vh;
+  height: 15vh;
+  flex-shrink: 0;
   filter: drop-shadow(0 0.4vh 1.2vh rgba(0, 0, 0, 0.35));
 }
 
-.cabecalho__titulo { display: flex; flex-direction: column; gap: 0.3vh; }
+.cabecalho__titulo { display: flex; flex-direction: column; gap: 0.3vh; flex: 1; min-width: 0; }
+
+.cabecalho__data {
+  flex-shrink: 0;
+  max-width: 32vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--fonte-display);
+  font-size: 1.1vw;
+  font-weight: 600;
+  color: var(--texto-sub);
+  text-align: right;
+  padding: 0.7vh 1.3vw;
+  border-radius: 999px;
+  border: 1px solid var(--vidro-borda);
+  background: var(--vidro-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
 
 .cabecalho__setor {
   font-family: var(--fonte-display);

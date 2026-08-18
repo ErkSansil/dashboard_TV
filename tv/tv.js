@@ -63,19 +63,19 @@ function renderizarVazio() {
 }
 
 function renderizar(slide, dados) {
-  document.getElementById('rotuloSetor').textContent = slide.setor === 'vendas' ? 'Vendas' : 'Qualificação';
+  document.getElementById('rotuloSetor').textContent = slide.setor === 'vendas' ? 'Ranking Vendas' : 'Ranking Qualificação';
   var elPeriodo = document.getElementById('rotuloPeriodo');
-  elPeriodo.textContent = rotuloPeriodo(slide.periodo, dados.rotulo);
+  elPeriodo.textContent = nomePeriodo(slide.periodo);
   elPeriodo.className = 'cabecalho__periodo cabecalho__periodo--' + slide.periodo;
+  document.getElementById('rotuloData').textContent = dados.rotulo || '';
   var metricas = metricasParaExibir(ESTADO.config);
   renderizarPodio(dados.podio, metricas, ESTADO.config);
   renderizarLista(dados.resto, metricas, ESTADO.config);
 }
 
-function rotuloPeriodo(periodo, rotulo) {
+function nomePeriodo(periodo) {
   var nomes = { dia: 'Hoje', semana: 'Semana', mes: 'Mês', ano: 'Ano' };
-  var nome = nomes[periodo] || periodo;
-  return rotulo ? nome + ' · ' + rotulo : nome;
+  return nomes[periodo] || periodo;
 }
 
 function formatarPercentual(numero) {
