@@ -181,8 +181,8 @@ body.tema-amo::before {
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  gap: 2.6vw;
-  min-height: 46vh;
+  gap: 2.2vw;
+  min-height: 40vh;
 }
 
 .podio__item {
@@ -194,9 +194,9 @@ body.tema-amo::before {
   background: var(--vidro-bg);
   backdrop-filter: blur(14px) saturate(130%);
   -webkit-backdrop-filter: blur(14px) saturate(130%);
-  border: 2px solid var(--vidro-borda);
-  border-radius: 1.6vw;
-  padding: 2.8vh 2.1vw;
+  border: 1px solid var(--vidro-borda);
+  border-radius: 1.4vw;
+  padding: 2.2vh 1.6vw;
   box-shadow: 0 1.5vh 3vh var(--vidro-sombra), inset 0 1px 0 var(--vidro-brilho);
   transition: transform 0.6s ease, box-shadow 0.6s ease;
 }
@@ -212,26 +212,23 @@ body.tema-amo::before {
 
 .podio__item--pos1 {
   order: 2;
-  transform: scale(1.24) translateY(-2.5vh);
+  transform: scale(1.15) translateY(-2vh);
   border-color: var(--ouro);
-  border-width: 3px;
-  box-shadow: 0 0 5vh rgba(245, 196, 81, 0.5), inset 0 1px 0 var(--vidro-brilho);
+  box-shadow: 0 0 4vh rgba(245, 196, 81, 0.4), inset 0 1px 0 var(--vidro-brilho);
 }
 
 .podio__item--pos2 {
   order: 1;
-  transform: scale(1.06);
   border-color: var(--prata);
-  border-width: 2.5px;
-  box-shadow: 0 0 3vh rgba(199, 205, 214, 0.4), inset 0 1px 0 var(--vidro-brilho);
+  border-width: 2px;
+  box-shadow: 0 0 2.4vh rgba(199, 205, 214, 0.35), inset 0 1px 0 var(--vidro-brilho);
 }
 
 .podio__item--pos3 {
   order: 3;
-  transform: scale(1.06);
   border-color: var(--bronze);
-  border-width: 2.5px;
-  box-shadow: 0 0 3vh rgba(205, 127, 50, 0.4), inset 0 1px 0 var(--vidro-brilho);
+  border-width: 2px;
+  box-shadow: 0 0 2.4vh rgba(205, 127, 50, 0.35), inset 0 1px 0 var(--vidro-brilho);
 }
 
 .podio__item--pos1::after {
@@ -253,24 +250,39 @@ body.tema-amo::before {
 }
 
 .podio__foto {
-  width: 11vw;
-  height: 11vw;
+  width: 9vw;
+  height: 9vw;
   border-radius: 50%;
   background-size: cover;
   background-position: center;
   background-color: var(--borda);
-  margin-bottom: 1.6vh;
-  border: 3px solid var(--vidro-brilho);
+  margin-bottom: 1.4vh;
+  border: 2px solid var(--vidro-brilho);
 }
 
-.podio__posicao { font-size: 1.15vw; color: var(--texto-sub); font-weight: 700; letter-spacing: 0.04em; }
-.podio__nome { font-family: var(--fonte-display); font-size: 2vw; font-weight: 700; margin: 0.5vh 0; text-align: center; }
+.podio__posicao { font-size: 1vw; color: var(--texto-sub); font-weight: 700; letter-spacing: 0.04em; }
+.podio__nome { font-family: var(--fonte-display); font-size: 1.7vw; font-weight: 700; margin: 0.5vh 0; text-align: center; }
 .podio__metrica {
   font-family: var(--fonte-display);
-  font-size: 2.7vw;
+  font-size: 3vw;
   font-weight: 800;
   color: var(--acento);
   text-shadow: 0 0 1.6vh var(--acento-brilho);
+}
+
+.podio__item--pos1 .podio__metrica {
+  color: var(--ouro);
+  text-shadow: 0 0 2vh rgba(245, 196, 81, 0.55);
+}
+
+.podio__item--pos2 .podio__metrica {
+  color: var(--prata);
+  text-shadow: 0 0 2vh rgba(199, 205, 214, 0.45);
+}
+
+.podio__item--pos3 .podio__metrica {
+  color: var(--bronze);
+  text-shadow: 0 0 2vh rgba(205, 127, 50, 0.45);
 }
 
 .podio__secundarias {
