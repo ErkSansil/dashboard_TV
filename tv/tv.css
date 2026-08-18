@@ -87,11 +87,53 @@ body.tema-amo {
 }
 
 .cabecalho__periodo {
-  font-size: 1.1vw;
-  color: var(--texto-sub);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5vw;
+  width: fit-content;
+  margin-top: 0.6vh;
+  padding: 0.6vh 1.1vw;
+  border-radius: 999px;
+  font-family: var(--fonte-display);
+  font-size: 1.05vw;
+  color: #fff;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  font-weight: 600;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+}
+
+.cabecalho__periodo::before {
+  content: '';
+  width: 0.6vw;
+  height: 0.6vw;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.cabecalho__periodo--dia {
+  background: linear-gradient(135deg, #22c55e, #15803d);
+  box-shadow: 0 0 1.8vh rgba(34, 197, 94, 0.45);
+}
+.cabecalho__periodo--dia::before { animation: pulsoDia 1.6s ease-in-out infinite; }
+
+.cabecalho__periodo--semana {
+  background: linear-gradient(135deg, #38bdf8, #0369a1);
+  box-shadow: 0 0 1.8vh rgba(56, 189, 248, 0.4);
+}
+
+.cabecalho__periodo--mes {
+  background: linear-gradient(135deg, var(--ouro), #b8860b);
+  box-shadow: 0 0 1.8vh rgba(245, 196, 81, 0.4);
+}
+
+.cabecalho__periodo--ano {
+  background: linear-gradient(135deg, #a78bfa, #6d28d9);
+  box-shadow: 0 0 1.8vh rgba(167, 139, 250, 0.4);
+}
+
+@keyframes pulsoDia {
+  0%, 100% { transform: scale(1); opacity: 0.85; }
+  50% { transform: scale(1.4); opacity: 1; }
 }
 
 .conteudo {
@@ -225,11 +267,15 @@ body.tema-amo {
 
 .lista {
   flex: 1;
-  overflow-y: auto;
+  overflow-y: hidden;
   display: flex;
   flex-direction: column;
   gap: 0.7vh;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
 }
+
+.lista::-webkit-scrollbar { display: none; }
 
 .lista__linha {
   position: relative;

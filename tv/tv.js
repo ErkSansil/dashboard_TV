@@ -57,13 +57,16 @@ function aplicarTema(tema) {
 }
 
 function renderizarVazio() {
+  pararAutoScroll();
   document.getElementById('podio').innerHTML = '<p class="mensagem-vazia">Nenhum ranking configurado</p>';
   document.getElementById('lista').innerHTML = '';
 }
 
 function renderizar(slide, dados) {
   document.getElementById('rotuloSetor').textContent = slide.setor === 'vendas' ? 'Vendas' : 'Qualificação';
-  document.getElementById('rotuloPeriodo').textContent = rotuloPeriodo(slide.periodo, dados.rotulo);
+  var elPeriodo = document.getElementById('rotuloPeriodo');
+  elPeriodo.textContent = rotuloPeriodo(slide.periodo, dados.rotulo);
+  elPeriodo.className = 'cabecalho__periodo cabecalho__periodo--' + slide.periodo;
   var metricas = metricasParaExibir(ESTADO.config);
   renderizarPodio(dados.podio, metricas, ESTADO.config);
   renderizarLista(dados.resto, metricas, ESTADO.config);
@@ -145,6 +148,54 @@ function renderizarLista(resto, metricas, config) {
       '<span class="lista__metricas">' + htmlMetricas + '</span>';
     container.appendChild(linha);
   });
+  iniciarAutoScroll(container);
+}
+
+var AUTOSCROLL = { frameId: null, timeoutId: null };
+
+function pararAutoScroll() {
+  if (AUTOSCROLL.frameId) {
+    cancelAnimationFrame(AUTOSCROLL.frameId);
+    AUTOSCROLL.frameId = null;
+  }
+  if (AUTOSCROLL.timeoutId) {
+    clearTimeout(AUTOSCROLL.timeoutId);
+    AUTOSCROLL.timeoutId = null;
+  }
+}
+
+function suavizarAutoScroll(t) {
+  return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+}
+
+function iniciarAutoScroll(container) {
+  pararAutoScroll();
+  var distancia = container.scrollHeight - container.clientHeight;
+  if (distancia <= 4) {
+    container.scrollTop = 0;
+    return;
+  }
+  var pxPorSegundo = 22;
+  var duracao = Math.max(4000, (distancia / pxPorSegundo) * 1000);
+  var pausa = 2200;
+
+  function animarCiclo(indoParaBaixo) {
+    var inicio = null;
+    function passo(agora) {
+      if (inicio === null) inicio = agora;
+      var progresso = Math.min(1, (agora - inicio) / duracao);
+      var valor = suavizarAutoScroll(progresso);
+      container.scrollTop = indoParaBaixo ? distancia * valor : distancia * (1 - valor);
+      if (progresso < 1) {
+        AUTOSCROLL.frameId = requestAnimationFrame(passo);
+      } else {
+        AUTOSCROLL.timeoutId = setTimeout(function () { animarCiclo(!indoParaBaixo); }, pausa);
+      }
+    }
+    AUTOSCROLL.frameId = requestAnimationFrame(passo);
+  }
+
+  animarCiclo(true);
 }
 
 iniciar();
