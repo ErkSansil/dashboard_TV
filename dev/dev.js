@@ -32,9 +32,24 @@ function carregarConfig() {
     });
 }
 
+var METRICAS_CAMPO = [
+  { chave: 'aproveitamento', id: 'metricaAproveitamento' },
+  { chave: 'vendasImediato', id: 'metricaVendasImediato' },
+  { chave: 'contratos', id: 'metricaContratos' },
+  { chave: 'extra1', id: 'metricaExtra1' },
+  { chave: 'extra2', id: 'metricaExtra2' }
+];
+
 function preencherFormulario(config) {
   document.getElementById('campoTema').value = config.tema;
   document.getElementById('campoQtdLista').value = config.qtdLista;
+  document.getElementById('campoRotuloExtra1').value = config.rotuloExtra1 || '';
+  document.getElementById('campoRotuloExtra2').value = config.rotuloExtra2 || '';
+
+  var metricasVisiveis = config.metricasVisiveis || [];
+  METRICAS_CAMPO.forEach(function (item) {
+    document.getElementById(item.id).checked = metricasVisiveis.indexOf(item.chave) !== -1;
+  });
 
   var seletorFixado = document.getElementById('campoFixado');
   seletorFixado.innerHTML = '<option value="">Rodízio normal</option>';
@@ -60,6 +75,8 @@ function preencherFormulario(config) {
       '<label>Coluna Aproveitamento <input type="text" data-indice="' + indice + '" data-campo="colunas.aproveitamento" value="' + slide.colunas.aproveitamento + '" /></label>' +
       '<label>Coluna Vendas Imediato <input type="text" data-indice="' + indice + '" data-campo="colunas.vendasImediato" value="' + slide.colunas.vendasImediato + '" /></label>' +
       '<label>Coluna Contratos <input type="text" data-indice="' + indice + '" data-campo="colunas.contratos" value="' + slide.colunas.contratos + '" /></label>' +
+      '<label>Coluna Extra 1 <input type="text" data-indice="' + indice + '" data-campo="colunas.extra1" value="' + (slide.colunas.extra1 || '') + '" /></label>' +
+      '<label>Coluna Extra 2 <input type="text" data-indice="' + indice + '" data-campo="colunas.extra2" value="' + (slide.colunas.extra2 || '') + '" /></label>' +
       '<label>Ordenar por' +
         '<select data-indice="' + indice + '" data-campo="ordenarPor">' +
           '<option value="aproveitamento"' + (slide.ordenarPor === 'aproveitamento' ? ' selected' : '') + '>Aproveitamento (%)</option>' +
@@ -85,6 +102,12 @@ function lerFormularioParaConfig() {
 
   var fixadoValor = document.getElementById('campoFixado').value;
   config.fixado = fixadoValor ? { setor: fixadoValor.split('|')[0], periodo: fixadoValor.split('|')[1] } : null;
+
+  config.metricasVisiveis = METRICAS_CAMPO
+    .filter(function (item) { return document.getElementById(item.id).checked; })
+    .map(function (item) { return item.chave; });
+  config.rotuloExtra1 = document.getElementById('campoRotuloExtra1').value.trim();
+  config.rotuloExtra2 = document.getElementById('campoRotuloExtra2').value.trim();
 
   document.querySelectorAll('#listaSlides [data-indice]').forEach(function (campo) {
     var indice = Number(campo.getAttribute('data-indice'));

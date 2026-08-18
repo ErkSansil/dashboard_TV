@@ -191,6 +191,38 @@ body.tema-amo {
 .podio__nome { font-family: var(--fonte-display); font-size: 1.7vw; font-weight: 700; margin: 0.5vh 0; text-align: center; }
 .podio__metrica { font-family: var(--fonte-display); font-size: 2.2vw; font-weight: 800; color: var(--acento); }
 
+.podio__secundarias {
+  display: flex;
+  gap: 0.6vw;
+  margin-top: 0.8vh;
+}
+
+.podio__chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1vh;
+  padding: 0.4vh 0.7vw;
+  border-radius: 0.6vw;
+  background: rgba(0, 0, 0, 0.18);
+  border: 1px solid var(--vidro-borda);
+}
+
+.podio__chip-rotulo {
+  font-size: 0.65vw;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--texto-sub);
+  font-weight: 600;
+}
+
+.podio__chip-valor {
+  font-family: var(--fonte-display);
+  font-size: 1vw;
+  font-weight: 700;
+  color: var(--texto);
+}
+
 .lista {
   flex: 1;
   overflow-y: auto;
@@ -230,5 +262,32 @@ body.tema-amo {
 }
 
 .lista__nome { font-size: 1.3vw; font-weight: 600; }
-.lista__metrica { font-family: var(--fonte-display); font-size: 1.4vw; font-weight: 700; color: var(--acento); }
+
+.lista__metricas {
+  display: flex;
+  align-items: center;
+  gap: 1.4vw;
+  justify-content: flex-end;
+}
+
+.lista__metrica {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4vw;
+  font-family: var(--fonte-display);
+  font-size: 1.4vw;
+  font-weight: 700;
+  color: var(--acento);
+  white-space: nowrap;
+}
+
+.lista__metrica-rotulo {
+  font-family: var(--fonte);
+  font-size: 0.75vw;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--texto-sub);
+}
+
 .mensagem-vazia { text-align: center; color: var(--texto-sub); font-size: 1.4vw; }

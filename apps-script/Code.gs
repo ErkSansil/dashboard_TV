@@ -116,10 +116,17 @@ function encontrarSlide(config, setor, periodo) {
   return null;
 }
 
+function ultimaColunaSlide(slide) {
+  if (slide.colunas.extra2) return slide.colunas.extra2;
+  if (slide.colunas.extra1) return slide.colunas.extra1;
+  return slide.colunas.contratos;
+}
+
 function lerRankingVendas(aba, slide) {
   var ultimaLinha = aba.getLastRow();
   if (ultimaLinha < slide.linhaInicial) return [];
-  var intervalo = slide.colunas.nome + slide.linhaInicial + ':' + slide.colunas.contratos + ultimaLinha;
+  var ultimaColuna = ultimaColunaSlide(slide);
+  var intervalo = slide.colunas.nome + slide.linhaInicial + ':' + ultimaColuna + ultimaLinha;
   var valores = aba.getRange(intervalo).getValues();
   return montarPessoasDeValores(valores);
 }

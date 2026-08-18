@@ -100,7 +100,35 @@ h1, h2 { font-family: var(--fonte-display); }
 }
 
 .campo { margin-bottom: 1.2rem; display: flex; flex-direction: column; gap: 0.4rem; }
-.campo label { font-size: 0.85rem; font-weight: 600; color: var(--texto-sub); }
+.campo > label { font-size: 0.85rem; font-weight: 600; color: var(--texto-sub); }
+
+.campo-metricas {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.8rem;
+  border: 1px solid var(--borda);
+  border-radius: 10px;
+  background: var(--bg-elevado);
+}
+.campo-metricas__item {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem !important;
+  font-weight: 500 !important;
+  color: var(--texto) !important;
+}
+.campo-metricas__item input[type="checkbox"] { width: auto; flex-shrink: 0; }
+.campo-metricas__rotulo {
+  flex: 1;
+  padding: 0.3rem 0.5rem !important;
+  border-radius: 6px !important;
+  border: 1px solid var(--borda) !important;
+  font-size: 0.85rem !important;
+  font-family: var(--fonte) !important;
+}
 .campo select, .campo input {
   padding: 0.6rem 0.7rem;
   border-radius: 10px;

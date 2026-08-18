@@ -9,12 +9,19 @@ if (typeof require !== 'undefined' && typeof buildDriveImageUrl === 'undefined')
   var buildDriveImageUrl = _drive.buildDriveImageUrl;
 }
 
-function normalizeVendaRow(nome, aproveitamentoRaw, vendasImediatoRaw, contratosRaw) {
+function valorExtraOuNulo(valorBruto) {
+  if (valorBruto === undefined || valorBruto === null || valorBruto === '') return null;
+  return parseNumberValue(valorBruto);
+}
+
+function normalizeVendaRow(nome, aproveitamentoRaw, vendasImediatoRaw, contratosRaw, extra1Raw, extra2Raw) {
   return {
     nome: String(nome).trim(),
     aproveitamento: toPercentNumber(aproveitamentoRaw),
     vendasImediato: parseNumberValue(vendasImediatoRaw),
-    contratos: parseNumberValue(contratosRaw)
+    contratos: parseNumberValue(contratosRaw),
+    extra1: valorExtraOuNulo(extra1Raw),
+    extra2: valorExtraOuNulo(extra2Raw)
   };
 }
 
@@ -24,7 +31,7 @@ function montarPessoasDeValores(valoresLinhas) {
     var linha = valoresLinhas[i];
     var nome = linha[0];
     if (!nome || String(nome).trim() === '') continue;
-    pessoas.push(normalizeVendaRow(nome, linha[1], linha[2], linha[3]));
+    pessoas.push(normalizeVendaRow(nome, linha[1], linha[2], linha[3], linha[4], linha[5]));
   }
   return pessoas;
 }

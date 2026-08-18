@@ -15,7 +15,19 @@ const {
 
 test('normalizeVendaRow converte e limpa os campos de uma linha', () => {
   const pessoa = normalizeVendaRow(' Alice ', 0.3333, 1, 2);
-  assert.deepEqual(pessoa, { nome: 'Alice', aproveitamento: 33.33, vendasImediato: 1, contratos: 2 });
+  assert.deepEqual(pessoa, { nome: 'Alice', aproveitamento: 33.33, vendasImediato: 1, contratos: 2, extra1: null, extra2: null });
+});
+
+test('normalizeVendaRow converte as colunas extras quando presentes', () => {
+  const pessoa = normalizeVendaRow('Alice', 0.3333, 1, 2, 10, 5);
+  assert.equal(pessoa.extra1, 10);
+  assert.equal(pessoa.extra2, 5);
+});
+
+test('normalizeVendaRow trata coluna extra vazia como nula', () => {
+  const pessoa = normalizeVendaRow('Alice', 0.3333, 1, 2, '', undefined);
+  assert.equal(pessoa.extra1, null);
+  assert.equal(pessoa.extra2, null);
 });
 
 test('montarPessoasDeValores ignora linhas sem nome', () => {
@@ -35,6 +47,13 @@ test('montarPessoasDeValores mantém pessoas com resultado zerado', () => {
   const pessoas = montarPessoasDeValores(valores);
   assert.equal(pessoas.length, 1);
   assert.equal(pessoas[0].aproveitamento, 0);
+});
+
+test('montarPessoasDeValores lê as colunas extras quando a linha tem 6 valores', () => {
+  const valores = [['Alice', 0.5, 3, 4, 12, 8]];
+  const pessoas = montarPessoasDeValores(valores);
+  assert.equal(pessoas[0].extra1, 12);
+  assert.equal(pessoas[0].extra2, 8);
 });
 
 test('sortRanking ordena por aproveitamento decrescente por padrão', () => {

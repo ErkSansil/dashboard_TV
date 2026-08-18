@@ -1,31 +1,36 @@
+var METRICAS_DISPONIVEIS = ['aproveitamento', 'vendasImediato', 'contratos', 'extra1', 'extra2'];
+
 function configPadrao() {
   return {
     tema: 'escuro',
     qtdLista: 7,
+    metricasVisiveis: ['aproveitamento', 'vendasImediato', 'contratos'],
+    rotuloExtra1: '',
+    rotuloExtra2: '',
     fixado: null,
     slides: [
       {
         chave: 'vendas-dia', setor: 'vendas', periodo: 'dia', ativo: true, duracaoSegundos: 20,
         linhaInicial: 4,
-        colunas: { nome: 'E', aproveitamento: 'F', vendasImediato: 'G', contratos: 'H' },
+        colunas: { nome: 'E', aproveitamento: 'F', vendasImediato: 'G', contratos: 'H', extra1: 'I', extra2: 'J' },
         rotuloCelulas: ['F2'], ordenarPor: 'aproveitamento', direcao: 'desc'
       },
       {
         chave: 'vendas-semana', setor: 'vendas', periodo: 'semana', ativo: true, duracaoSegundos: 20,
         linhaInicial: 4,
-        colunas: { nome: 'P', aproveitamento: 'Q', vendasImediato: 'R', contratos: 'S' },
+        colunas: { nome: 'P', aproveitamento: 'Q', vendasImediato: 'R', contratos: 'S', extra1: 'T', extra2: 'U' },
         rotuloCelulas: ['Q2', 'R2'], ordenarPor: 'aproveitamento', direcao: 'desc'
       },
       {
         chave: 'vendas-mes', setor: 'vendas', periodo: 'mes', ativo: true, duracaoSegundos: 20,
         linhaInicial: 4,
-        colunas: { nome: 'AA', aproveitamento: 'AB', vendasImediato: 'AC', contratos: 'AD' },
+        colunas: { nome: 'AA', aproveitamento: 'AB', vendasImediato: 'AC', contratos: 'AD', extra1: 'AE', extra2: 'AF' },
         rotuloCelulas: ['AA2', 'AB2', 'AC2'], ordenarPor: 'aproveitamento', direcao: 'desc'
       },
       {
         chave: 'vendas-ano', setor: 'vendas', periodo: 'ano', ativo: false, duracaoSegundos: 20,
         linhaInicial: 4,
-        colunas: { nome: '', aproveitamento: '', vendasImediato: '', contratos: '' },
+        colunas: { nome: '', aproveitamento: '', vendasImediato: '', contratos: '', extra1: '', extra2: '' },
         rotuloCelulas: [], ordenarPor: 'aproveitamento', direcao: 'desc'
       }
     ]
@@ -64,6 +69,15 @@ function validarConfig(config) {
   }
   if (['claro', 'escuro', 'amo'].indexOf(config.tema) === -1) {
     erros.push('tema precisa ser "claro", "escuro" ou "amo"');
+  }
+  if (!Array.isArray(config.metricasVisiveis) || config.metricasVisiveis.length === 0) {
+    erros.push('metricasVisiveis precisa ser uma lista com pelo menos 1 item');
+  } else {
+    config.metricasVisiveis.forEach(function (metrica) {
+      if (METRICAS_DISPONIVEIS.indexOf(metrica) === -1) {
+        erros.push('metricasVisiveis contém um valor inválido: ' + metrica);
+      }
+    });
   }
   return { valido: erros.length === 0, erros: erros };
 }

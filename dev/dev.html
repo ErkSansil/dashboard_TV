@@ -40,6 +40,16 @@
         <label>Fixar uma tela (opcional)</label>
         <select id="campoFixado"></select>
       </div>
+      <div class="campo">
+        <label>Métricas exibidas</label>
+        <div class="campo-metricas">
+          <label class="campo-metricas__item"><input type="checkbox" id="metricaAproveitamento" /> Aproveitamento (%)</label>
+          <label class="campo-metricas__item"><input type="checkbox" id="metricaVendasImediato" /> Vendas Imediato</label>
+          <label class="campo-metricas__item"><input type="checkbox" id="metricaContratos" /> Contratos</label>
+          <label class="campo-metricas__item"><input type="checkbox" id="metricaExtra1" /> <input type="text" id="campoRotuloExtra1" placeholder="Nome da métrica extra 1" class="campo-metricas__rotulo" /></label>
+          <label class="campo-metricas__item"><input type="checkbox" id="metricaExtra2" /> <input type="text" id="campoRotuloExtra2" placeholder="Nome da métrica extra 2" class="campo-metricas__rotulo" /></label>
+        </div>
+      </div>
       <div id="listaSlides"></div>
       <button id="botaoSalvar">Salvar configuração</button>
       <p id="mensagemSalvar" class="mensagem-status"></p>

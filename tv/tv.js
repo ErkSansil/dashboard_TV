@@ -64,8 +64,9 @@ function renderizarVazio() {
 function renderizar(slide, dados) {
   document.getElementById('rotuloSetor').textContent = slide.setor === 'vendas' ? 'Vendas' : 'Qualificação';
   document.getElementById('rotuloPeriodo').textContent = rotuloPeriodo(slide.periodo, dados.rotulo);
-  renderizarPodio(dados.podio);
-  renderizarLista(dados.resto);
+  var metricas = metricasParaExibir(ESTADO.config);
+  renderizarPodio(dados.podio, metricas, ESTADO.config);
+  renderizarLista(dados.resto, metricas, ESTADO.config);
 }
 
 function rotuloPeriodo(periodo, rotulo) {
@@ -78,34 +79,70 @@ function formatarPercentual(numero) {
   return numero.toFixed(2).replace('.', ',') + '%';
 }
 
-function renderizarPodio(podio) {
+function formatarNumeroOuTraco(valor) {
+  return valor === null || valor === undefined ? '—' : String(valor);
+}
+
+var METRICA_INFO = {
+  aproveitamento: { rotulo: 'Aproveitamento', formatar: formatarPercentual },
+  vendasImediato: { rotulo: 'Imediato', formatar: formatarNumeroOuTraco },
+  contratos: { rotulo: 'Contratos', formatar: formatarNumeroOuTraco }
+};
+
+function infoMetrica(chave, config) {
+  if (chave === 'extra1') {
+    return { rotulo: (config && config.rotuloExtra1) || 'Extra 1', formatar: formatarNumeroOuTraco };
+  }
+  if (chave === 'extra2') {
+    return { rotulo: (config && config.rotuloExtra2) || 'Extra 2', formatar: formatarNumeroOuTraco };
+  }
+  return METRICA_INFO[chave];
+}
+
+function metricasParaExibir(config) {
+  var metricas = config && Array.isArray(config.metricasVisiveis) ? config.metricasVisiveis : null;
+  return metricas && metricas.length > 0 ? metricas : ['aproveitamento'];
+}
+
+function renderizarPodio(podio, metricas, config) {
   var container = document.getElementById('podio');
   container.innerHTML = '';
+  var principal = metricas[0];
+  var secundarias = metricas.slice(1);
   [1, 0, 2].forEach(function (indice) {
     var pessoa = podio[indice];
     if (!pessoa) return;
     var item = document.createElement('div');
     item.className = 'podio__item podio__item--pos' + pessoa.posicao;
+    var chips = secundarias.map(function (chave) {
+      var info = infoMetrica(chave, config);
+      return '<span class="podio__chip"><span class="podio__chip-rotulo">' + info.rotulo + '</span><span class="podio__chip-valor">' + info.formatar(pessoa[chave]) + '</span></span>';
+    }).join('');
     item.innerHTML =
       '<div class="podio__foto" style="background-image:url(' + (pessoa.foto || '') + ')"></div>' +
       '<div class="podio__posicao">' + pessoa.posicao + 'º</div>' +
       '<div class="podio__nome">' + pessoa.nome + '</div>' +
-      '<div class="podio__metrica">' + formatarPercentual(pessoa.aproveitamento) + '</div>';
+      '<div class="podio__metrica">' + infoMetrica(principal, config).formatar(pessoa[principal]) + '</div>' +
+      (chips ? '<div class="podio__secundarias">' + chips + '</div>' : '');
     container.appendChild(item);
   });
 }
 
-function renderizarLista(resto) {
+function renderizarLista(resto, metricas, config) {
   var container = document.getElementById('lista');
   container.innerHTML = '';
   resto.forEach(function (pessoa) {
     var linha = document.createElement('div');
     linha.className = 'lista__linha';
+    var htmlMetricas = metricas.map(function (chave) {
+      var info = infoMetrica(chave, config);
+      return '<span class="lista__metrica"><span class="lista__metrica-rotulo">' + info.rotulo + '</span>' + info.formatar(pessoa[chave]) + '</span>';
+    }).join('');
     linha.innerHTML =
       '<span class="lista__posicao">' + pessoa.posicao + 'º</span>' +
       '<span class="lista__foto" style="background-image:url(' + (pessoa.foto || '') + ')"></span>' +
       '<span class="lista__nome">' + pessoa.nome + '</span>' +
-      '<span class="lista__metrica">' + formatarPercentual(pessoa.aproveitamento) + '</span>';
+      '<span class="lista__metricas">' + htmlMetricas + '</span>';
     container.appendChild(linha);
   });
 }
