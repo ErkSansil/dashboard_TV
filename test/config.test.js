@@ -108,3 +108,48 @@ test('validarConfig aceita extra1/extra2 em metricasVisiveis', () => {
   const resultado = validarConfig(config);
   assert.equal(resultado.valido, true);
 });
+
+test('configPadrao vem com modoTroca "tempo" e voltasScroll 1 por padrão', () => {
+  const config = configPadrao();
+  config.slides.forEach((slide) => {
+    assert.equal(slide.modoTroca, 'tempo');
+    assert.equal(slide.voltasScroll, 1);
+  });
+});
+
+test('validarConfig aceita modoTroca "scroll"', () => {
+  const config = configPadrao();
+  config.slides[0].modoTroca = 'scroll';
+  config.slides[0].voltasScroll = 0;
+  const resultado = validarConfig(config);
+  assert.equal(resultado.valido, true);
+});
+
+test('validarConfig rejeita modoTroca desconhecido', () => {
+  const config = configPadrao();
+  config.slides[0].modoTroca = 'nunca';
+  const resultado = validarConfig(config);
+  assert.equal(resultado.valido, false);
+  assert.ok(resultado.erros.some((e) => e.includes('modoTroca')));
+});
+
+test('validarConfig rejeita voltasScroll negativo', () => {
+  const config = configPadrao();
+  config.slides[0].voltasScroll = -1;
+  const resultado = validarConfig(config);
+  assert.equal(resultado.valido, false);
+  assert.ok(resultado.erros.some((e) => e.includes('voltasScroll')));
+});
+
+test('configPadrao vem com velocidadeScroll 22 por padrão', () => {
+  const config = configPadrao();
+  assert.equal(config.velocidadeScroll, 22);
+});
+
+test('validarConfig rejeita velocidadeScroll zero ou negativa', () => {
+  const config = configPadrao();
+  config.velocidadeScroll = 0;
+  const resultado = validarConfig(config);
+  assert.equal(resultado.valido, false);
+  assert.ok(resultado.erros.some((e) => e.includes('velocidadeScroll')));
+});

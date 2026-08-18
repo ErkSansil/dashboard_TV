@@ -43,6 +43,7 @@ var METRICAS_CAMPO = [
 function preencherFormulario(config) {
   document.getElementById('campoTema').value = config.tema;
   document.getElementById('campoQtdLista').value = config.qtdLista;
+  document.getElementById('campoVelocidadeScroll').value = config.velocidadeScroll;
   document.getElementById('campoRotuloExtra1').value = config.rotuloExtra1 || '';
   document.getElementById('campoRotuloExtra2').value = config.rotuloExtra2 || '';
 
@@ -90,6 +91,15 @@ function preencherFormulario(config) {
           '<option value="desc"' + (slide.direcao === 'desc' ? ' selected' : '') + '>Maior primeiro</option>' +
           '<option value="asc"' + (slide.direcao === 'asc' ? ' selected' : '') + '>Menor primeiro</option>' +
         '</select>' +
+      '</label>' +
+      '<label>Trocar de período' +
+        '<select data-indice="' + indice + '" data-campo="modoTroca">' +
+          '<option value="tempo"' + (slide.modoTroca === 'tempo' ? ' selected' : '') + '>Por tempo (duração acima)</option>' +
+          '<option value="scroll"' + (slide.modoTroca === 'scroll' ? ' selected' : '') + '>Depois da rolagem (ignora a duração)</option>' +
+        '</select>' +
+      '</label>' +
+      '<label>Rolagens antes de trocar — só se "Depois da rolagem" (0 = passar 1x sem voltar, 1 = ida e volta 1x, 2 = ida e volta 2x...) ' +
+        '<input type="number" min="0" data-indice="' + indice + '" data-campo="voltasScroll" value="' + slide.voltasScroll + '" />' +
       '</label>';
     container.appendChild(bloco);
   });
@@ -99,6 +109,7 @@ function lerFormularioParaConfig() {
   var config = JSON.parse(JSON.stringify(CONFIG_ATUAL));
   config.tema = document.getElementById('campoTema').value;
   config.qtdLista = Number(document.getElementById('campoQtdLista').value);
+  config.velocidadeScroll = Number(document.getElementById('campoVelocidadeScroll').value);
 
   var fixadoValor = document.getElementById('campoFixado').value;
   config.fixado = fixadoValor ? { setor: fixadoValor.split('|')[0], periodo: fixadoValor.split('|')[1] } : null;

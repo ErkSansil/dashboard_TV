@@ -26,18 +26,21 @@ function agendarRotacao() {
     ESTADO.timerRotacao = setTimeout(function () { agendarRotacao(); }, 1000);
     return;
   }
-  mostrarSlideAtual();
   if (ESTADO.timerRotacao) clearTimeout(ESTADO.timerRotacao);
   var slideAtual = resolverSlideExibido(ESTADO.config, ESTADO.indiceRotacao);
-  var duracaoMs = slideAtual ? slideAtual.duracaoSegundos * 1000 : 20000;
-  ESTADO.timerRotacao = setTimeout(function () {
-    ESTADO.indiceRotacao = proximoIndiceSlide(ESTADO.indiceRotacao, obterSlidesAtivos(ESTADO.config).length);
-    agendarRotacao();
-  }, duracaoMs);
+  mostrarSlideAtual(slideAtual);
+  if (!slideAtual || slideAtual.modoTroca !== 'scroll') {
+    var duracaoMs = slideAtual ? slideAtual.duracaoSegundos * 1000 : 20000;
+    ESTADO.timerRotacao = setTimeout(avancarSlide, duracaoMs);
+  }
 }
 
-function mostrarSlideAtual() {
-  var slide = resolverSlideExibido(ESTADO.config, ESTADO.indiceRotacao);
+function avancarSlide() {
+  ESTADO.indiceRotacao = proximoIndiceSlide(ESTADO.indiceRotacao, obterSlidesAtivos(ESTADO.config).length);
+  agendarRotacao();
+}
+
+function mostrarSlideAtual(slide) {
   if (!slide) {
     renderizarVazio();
     return;
@@ -45,8 +48,20 @@ function mostrarSlideAtual() {
   fetch(APPS_SCRIPT_URL + '?action=ranking&setor=' + slide.setor + '&periodo=' + slide.periodo)
     .then(function (resposta) { return resposta.json(); })
     .then(function (dados) {
-      if (dados.ok) renderizar(slide, dados);
+      if (dados.ok) {
+        renderizar(slide, dados);
+      } else if (slide.modoTroca === 'scroll') {
+        agendarAvancoFallback(slide);
+      }
+    })
+    .catch(function () {
+      if (slide.modoTroca === 'scroll') agendarAvancoFallback(slide);
     });
+}
+
+function agendarAvancoFallback(slide) {
+  if (ESTADO.timerRotacao) clearTimeout(ESTADO.timerRotacao);
+  ESTADO.timerRotacao = setTimeout(avancarSlide, slide.duracaoSegundos * 1000);
 }
 
 function aplicarTema(tema) {
@@ -70,7 +85,7 @@ function renderizar(slide, dados) {
   document.getElementById('rotuloData').textContent = dados.rotulo || '';
   var metricas = metricasParaExibir(ESTADO.config);
   renderizarPodio(dados.podio, metricas, ESTADO.config);
-  renderizarLista(dados.resto, metricas, ESTADO.config);
+  renderizarLista(dados.resto, metricas, ESTADO.config, slide);
 }
 
 function nomePeriodo(periodo) {
@@ -131,7 +146,7 @@ function renderizarPodio(podio, metricas, config) {
   });
 }
 
-function renderizarLista(resto, metricas, config) {
+function renderizarLista(resto, metricas, config, slide) {
   var container = document.getElementById('lista');
   container.innerHTML = '';
   resto.forEach(function (pessoa) {
@@ -148,7 +163,23 @@ function renderizarLista(resto, metricas, config) {
       '<span class="lista__metricas">' + htmlMetricas + '</span>';
     container.appendChild(linha);
   });
-  iniciarAutoScroll(container);
+
+  var pxPorSegundo = velocidadeScroll(config);
+  if (slide && slide.modoTroca === 'scroll') {
+    iniciarAutoScroll(container, calcularMeiosCiclos(slide.voltasScroll), avancarSlide, pxPorSegundo);
+  } else {
+    iniciarAutoScroll(container, null, null, pxPorSegundo);
+  }
+}
+
+function velocidadeScroll(config) {
+  var valor = config && config.velocidadeScroll;
+  return typeof valor === 'number' && valor > 0 ? valor : 22;
+}
+
+function calcularMeiosCiclos(voltasScroll) {
+  var voltas = typeof voltasScroll === 'number' && voltasScroll >= 0 ? voltasScroll : 1;
+  return voltas === 0 ? 1 : voltas * 2;
 }
 
 var AUTOSCROLL = { frameId: null, timeoutId: null };
@@ -164,33 +195,37 @@ function pararAutoScroll() {
   }
 }
 
-function suavizarAutoScroll(t) {
-  return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
-}
-
-function iniciarAutoScroll(container) {
+function iniciarAutoScroll(container, metaMeiosCiclos, aoCompletar, pxPorSegundo) {
   pararAutoScroll();
   var distancia = container.scrollHeight - container.clientHeight;
   if (distancia <= 4) {
     container.scrollTop = 0;
+    if (aoCompletar) {
+      AUTOSCROLL.timeoutId = setTimeout(aoCompletar, 4000);
+    }
     return;
   }
-  var pxPorSegundo = 22;
-  var duracao = Math.max(4000, (distancia / pxPorSegundo) * 1000);
+  var velocidade = pxPorSegundo > 0 ? pxPorSegundo : 22;
+  var duracao = (distancia / velocidade) * 1000;
   var pausa = 2200;
+  var meiosCiclosFeitos = 0;
 
   function animarCiclo(indoParaBaixo) {
     var inicio = null;
     function passo(agora) {
       if (inicio === null) inicio = agora;
       var progresso = Math.min(1, (agora - inicio) / duracao);
-      var valor = suavizarAutoScroll(progresso);
-      container.scrollTop = indoParaBaixo ? distancia * valor : distancia * (1 - valor);
+      container.scrollTop = indoParaBaixo ? distancia * progresso : distancia * (1 - progresso);
       if (progresso < 1) {
         AUTOSCROLL.frameId = requestAnimationFrame(passo);
-      } else {
-        AUTOSCROLL.timeoutId = setTimeout(function () { animarCiclo(!indoParaBaixo); }, pausa);
+        return;
       }
+      meiosCiclosFeitos += 1;
+      if (metaMeiosCiclos && meiosCiclosFeitos >= metaMeiosCiclos) {
+        if (aoCompletar) aoCompletar();
+        return;
+      }
+      AUTOSCROLL.timeoutId = setTimeout(function () { animarCiclo(!indoParaBaixo); }, pausa);
     }
     AUTOSCROLL.frameId = requestAnimationFrame(passo);
   }
