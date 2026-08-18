@@ -3,8 +3,8 @@ var ESTADO = { config: null, indiceRotacao: 0, timerRotacao: null };
 function iniciar() {
   atualizarConfig(function () {
     agendarRotacao();
-    setInterval(function () { atualizarConfig(function () {}); }, 15000);
   });
+  setInterval(function () { atualizarConfig(function () {}); }, 15000);
 }
 
 function atualizarConfig(callback) {
@@ -21,6 +21,11 @@ function atualizarConfig(callback) {
 }
 
 function agendarRotacao() {
+  if (!ESTADO.config) {
+    if (ESTADO.timerRotacao) clearTimeout(ESTADO.timerRotacao);
+    ESTADO.timerRotacao = setTimeout(function () { agendarRotacao(); }, 1000);
+    return;
+  }
   mostrarSlideAtual();
   if (ESTADO.timerRotacao) clearTimeout(ESTADO.timerRotacao);
   var slideAtual = resolverSlideExibido(ESTADO.config, ESTADO.indiceRotacao);
