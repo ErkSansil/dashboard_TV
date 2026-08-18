@@ -5,7 +5,7 @@
   --texto-sub: #9aa0ac;
   --ouro: #f5c451;
   --prata: #c7cdd6;
-  --bronze: #d99a63;
+  --bronze: #cd7f32;
   --acento: #ec4899;
   --acento-brilho: rgba(236, 72, 153, 0.4);
   --borda: #232733;
@@ -41,7 +41,7 @@ body.tema-claro {
 }
 
 body.tema-amo {
-  --bg: #0a0614;
+  --bg: #150c29;
   --bg-elevado: rgba(28, 15, 46, 0.5);
   --texto: #f7f3ff;
   --texto-sub: #b9a8dd;
@@ -60,11 +60,11 @@ body.tema-amo::before {
   inset: -30%;
   z-index: -1;
   background:
-    radial-gradient(circle at 20% 25%, rgba(236, 72, 153, 0.22), transparent 38%),
-    radial-gradient(circle at 80% 15%, rgba(99, 102, 241, 0.22), transparent 40%),
-    radial-gradient(circle at 25% 80%, rgba(139, 92, 246, 0.2), transparent 42%),
-    radial-gradient(circle at 85% 80%, rgba(59, 130, 246, 0.16), transparent 42%),
-    linear-gradient(160deg, #0a0614 0%, #140a26 45%, #08040f 100%);
+    radial-gradient(circle at 20% 25%, rgba(236, 72, 153, 0.38), transparent 40%),
+    radial-gradient(circle at 80% 15%, rgba(99, 102, 241, 0.38), transparent 42%),
+    radial-gradient(circle at 25% 80%, rgba(139, 92, 246, 0.34), transparent 44%),
+    radial-gradient(circle at 85% 80%, rgba(59, 130, 246, 0.28), transparent 44%),
+    linear-gradient(160deg, #150c29 0%, #23124a 45%, #100823 100%);
   filter: blur(10px);
   will-change: transform;
   animation: liquidoAmo 30s ease-in-out infinite alternate;
@@ -181,8 +181,8 @@ body.tema-amo::before {
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  gap: 2.2vw;
-  min-height: 40vh;
+  gap: 2.6vw;
+  min-height: 46vh;
 }
 
 .podio__item {
@@ -194,9 +194,9 @@ body.tema-amo::before {
   background: var(--vidro-bg);
   backdrop-filter: blur(14px) saturate(130%);
   -webkit-backdrop-filter: blur(14px) saturate(130%);
-  border: 1px solid var(--vidro-borda);
-  border-radius: 1.4vw;
-  padding: 2.2vh 1.6vw;
+  border: 2px solid var(--vidro-borda);
+  border-radius: 1.6vw;
+  padding: 2.8vh 2.1vw;
   box-shadow: 0 1.5vh 3vh var(--vidro-sombra), inset 0 1px 0 var(--vidro-brilho);
   transition: transform 0.6s ease, box-shadow 0.6s ease;
 }
@@ -212,23 +212,26 @@ body.tema-amo::before {
 
 .podio__item--pos1 {
   order: 2;
-  transform: scale(1.15) translateY(-2vh);
+  transform: scale(1.24) translateY(-2.5vh);
   border-color: var(--ouro);
-  box-shadow: 0 0 4vh rgba(245, 196, 81, 0.4), inset 0 1px 0 var(--vidro-brilho);
+  border-width: 3px;
+  box-shadow: 0 0 5vh rgba(245, 196, 81, 0.5), inset 0 1px 0 var(--vidro-brilho);
 }
 
 .podio__item--pos2 {
   order: 1;
+  transform: scale(1.06);
   border-color: var(--prata);
-  border-width: 2px;
-  box-shadow: 0 0 2.4vh rgba(199, 205, 214, 0.35), inset 0 1px 0 var(--vidro-brilho);
+  border-width: 2.5px;
+  box-shadow: 0 0 3vh rgba(199, 205, 214, 0.4), inset 0 1px 0 var(--vidro-brilho);
 }
 
 .podio__item--pos3 {
   order: 3;
+  transform: scale(1.06);
   border-color: var(--bronze);
-  border-width: 2px;
-  box-shadow: 0 0 2.4vh rgba(217, 154, 99, 0.32), inset 0 1px 0 var(--vidro-brilho);
+  border-width: 2.5px;
+  box-shadow: 0 0 3vh rgba(205, 127, 50, 0.4), inset 0 1px 0 var(--vidro-brilho);
 }
 
 .podio__item--pos1::after {
@@ -250,21 +253,21 @@ body.tema-amo::before {
 }
 
 .podio__foto {
-  width: 9vw;
-  height: 9vw;
+  width: 11vw;
+  height: 11vw;
   border-radius: 50%;
   background-size: cover;
   background-position: center;
   background-color: var(--borda);
-  margin-bottom: 1.4vh;
-  border: 2px solid var(--vidro-brilho);
+  margin-bottom: 1.6vh;
+  border: 3px solid var(--vidro-brilho);
 }
 
-.podio__posicao { font-size: 1vw; color: var(--texto-sub); font-weight: 700; letter-spacing: 0.04em; }
-.podio__nome { font-family: var(--fonte-display); font-size: 1.7vw; font-weight: 700; margin: 0.5vh 0; text-align: center; }
+.podio__posicao { font-size: 1.15vw; color: var(--texto-sub); font-weight: 700; letter-spacing: 0.04em; }
+.podio__nome { font-family: var(--fonte-display); font-size: 2vw; font-weight: 700; margin: 0.5vh 0; text-align: center; }
 .podio__metrica {
   font-family: var(--fonte-display);
-  font-size: 2.2vw;
+  font-size: 2.7vw;
   font-weight: 800;
   color: var(--acento);
   text-shadow: 0 0 1.6vh var(--acento-brilho);
@@ -288,7 +291,7 @@ body.tema-amo::before {
 }
 
 .podio__chip-rotulo {
-  font-size: 0.65vw;
+  font-size: 0.72vw;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--texto-sub);
@@ -297,7 +300,7 @@ body.tema-amo::before {
 
 .podio__chip-valor {
   font-family: var(--fonte-display);
-  font-size: 1vw;
+  font-size: 1.15vw;
   font-weight: 700;
   color: var(--texto);
 }
