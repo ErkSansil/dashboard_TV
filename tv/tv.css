@@ -16,6 +16,7 @@
   --fonte: 'Inter', 'Segoe UI', Arial, sans-serif;
   --fonte-display: 'Sora', 'Segoe UI', Arial, sans-serif;
   --lista-escala: 1;
+  --podio-altura: 34;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -183,7 +184,8 @@ body.tema-amo::before {
   align-items: flex-end;
   justify-content: center;
   gap: 2.2vw;
-  min-height: 40vh;
+  min-height: calc(var(--podio-altura, 34) * 1vh);
+  flex-shrink: 0;
 }
 
 .podio__item {

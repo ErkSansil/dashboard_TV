@@ -15,6 +15,7 @@ function atualizarConfig(callback) {
         ESTADO.config = dados.config;
         aplicarTema(ESTADO.config.tema);
         aplicarEscalaLista(ESTADO.config.escalaLista);
+        aplicarAlturaPodio(ESTADO.config.alturaPodioVh);
       }
       callback();
     })
@@ -24,6 +25,11 @@ function atualizarConfig(callback) {
 function aplicarEscalaLista(escalaLista) {
   var valor = typeof escalaLista === 'number' && escalaLista > 0 ? escalaLista / 100 : 1;
   document.documentElement.style.setProperty('--lista-escala', String(valor));
+}
+
+function aplicarAlturaPodio(alturaPodioVh) {
+  var valor = typeof alturaPodioVh === 'number' && alturaPodioVh > 0 && alturaPodioVh < 100 ? alturaPodioVh : 34;
+  document.documentElement.style.setProperty('--podio-altura', String(valor));
 }
 
 function agendarRotacao() {

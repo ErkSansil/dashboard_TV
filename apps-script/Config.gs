@@ -7,6 +7,7 @@ function configPadrao() {
     velocidadeScroll: 22,
     duracaoFadeSegundos: 0.6,
     escalaLista: 100,
+    alturaPodioVh: 34,
     nomesExcluidos: [],
     metricasVisiveis: ['aproveitamento', 'vendasImediato', 'contratos'],
     rotuloExtra1: '',
@@ -90,6 +91,9 @@ function validarConfig(config) {
   }
   if (typeof config.escalaLista !== 'number' || config.escalaLista <= 0) {
     erros.push('escalaLista precisa ser um número maior que 0');
+  }
+  if (typeof config.alturaPodioVh !== 'number' || config.alturaPodioVh <= 0 || config.alturaPodioVh >= 100) {
+    erros.push('alturaPodioVh precisa ser um número entre 0 e 100');
   }
   if (!Array.isArray(config.nomesExcluidos)) {
     erros.push('nomesExcluidos precisa ser uma lista');

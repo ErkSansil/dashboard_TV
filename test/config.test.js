@@ -202,3 +202,18 @@ test('validarConfig rejeita nomesExcluidos que não seja uma lista', () => {
   assert.equal(resultado.valido, false);
   assert.ok(resultado.erros.some((e) => e.includes('nomesExcluidos')));
 });
+
+test('configPadrao vem com alturaPodioVh 34 por padrão', () => {
+  const config = configPadrao();
+  assert.equal(config.alturaPodioVh, 34);
+});
+
+test('validarConfig rejeita alturaPodioVh fora do intervalo 0-100', () => {
+  const config = configPadrao();
+  config.alturaPodioVh = 0;
+  assert.equal(validarConfig(config).valido, false);
+  config.alturaPodioVh = 100;
+  assert.equal(validarConfig(config).valido, false);
+  config.alturaPodioVh = 150;
+  assert.equal(validarConfig(config).valido, false);
+});
