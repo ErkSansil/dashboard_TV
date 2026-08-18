@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <title>Dashboard Comercial — DEV</title>
+  <link rel="icon" href="../assets/icone-amo.png" />
+  <link rel="stylesheet" href="dev.css" />
+</head>
+<body>
+  <div id="telaLogin" class="tela-login">
+    <form id="formLogin">
+      <img src="../assets/logo-amo.png" alt="AMO" class="tela-login__logo" />
+      <h1>Acesso DEV</h1>
+      <input type="text" id="campoUsuario" placeholder="Usuário" required />
+      <input type="password" id="campoSenha" placeholder="Senha" required />
+      <button type="submit">Entrar</button>
+      <p id="mensagemLogin" class="mensagem-erro"></p>
+    </form>
+  </div>
+
+  <div id="telaConfig" class="tela-config" hidden>
+    <aside class="painel-controles">
+      <h1>Configuração do rodízio</h1>
+      <div class="campo">
+        <label>Tema</label>
+        <select id="campoTema">
+          <option value="escuro">Escuro</option>
+          <option value="claro">Claro</option>
+        </select>
+      </div>
+      <div class="campo">
+        <label>Qtd. na lista (além do pódio)</label>
+        <input type="number" id="campoQtdLista" min="0" />
+      </div>
+      <div class="campo">
+        <label>Fixar uma tela (opcional)</label>
+        <select id="campoFixado"></select>
+      </div>
+      <div id="listaSlides"></div>
+      <button id="botaoSalvar">Salvar configuração</button>
+      <p id="mensagemSalvar" class="mensagem-status"></p>
+    </aside>
+    <main class="preview">
+      <h2>Preview ao vivo (o que está passando nas TVs)</h2>
+      <iframe src="../tv/tv.html" title="Preview da TV"></iframe>
+    </main>
+  </div>
+
+  <script src="../shared/percent.js"></script>
+  <script src="../shared/drive.js"></script>
+  <script src="../shared/ranking.js"></script>
+  <script src="../shared/config.js"></script>
+  <script src="../shared/rotation.js"></script>
+  <script src="../shared/apiConfig.js"></script>
+  <script src="dev.js"></script>
+</body>
+</html>
