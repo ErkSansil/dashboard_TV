@@ -153,3 +153,23 @@ test('validarConfig rejeita velocidadeScroll zero ou negativa', () => {
   assert.equal(resultado.valido, false);
   assert.ok(resultado.erros.some((e) => e.includes('velocidadeScroll')));
 });
+
+test('configPadrao vem com duracaoFadeSegundos 0.6 por padrão', () => {
+  const config = configPadrao();
+  assert.equal(config.duracaoFadeSegundos, 0.6);
+});
+
+test('validarConfig aceita duracaoFadeSegundos igual a 0 (sem fade)', () => {
+  const config = configPadrao();
+  config.duracaoFadeSegundos = 0;
+  const resultado = validarConfig(config);
+  assert.equal(resultado.valido, true);
+});
+
+test('validarConfig rejeita duracaoFadeSegundos negativa', () => {
+  const config = configPadrao();
+  config.duracaoFadeSegundos = -1;
+  const resultado = validarConfig(config);
+  assert.equal(resultado.valido, false);
+  assert.ok(resultado.erros.some((e) => e.includes('duracaoFadeSegundos')));
+});

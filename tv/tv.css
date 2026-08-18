@@ -1,6 +1,5 @@
 :root {
   --bg: #0b0d12;
-  --bg-imagem: none;
   --bg-elevado: #14171f;
   --texto: #f5f6f8;
   --texto-sub: #9aa0ac;
@@ -20,12 +19,12 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  background: var(--bg-imagem), var(--bg);
-  background-size: cover;
+  background: var(--bg);
   color: var(--texto);
   font-family: var(--fonte);
   height: 100vh;
   overflow: hidden;
+  position: relative;
 }
 
 body.tema-claro {
@@ -41,24 +40,43 @@ body.tema-claro {
 }
 
 body.tema-amo {
-  --bg: #1a0b14;
-  --bg-imagem:
-    radial-gradient(circle at 12% 15%, rgba(236, 72, 153, 0.4), transparent 42%),
-    radial-gradient(circle at 88% 12%, rgba(190, 24, 93, 0.32), transparent 45%),
-    radial-gradient(circle at 50% 100%, rgba(157, 23, 77, 0.45), transparent 55%),
-    linear-gradient(165deg, #1a0b14 0%, #2b0f22 45%, #150810 100%);
-  --bg-elevado: rgba(43, 15, 34, 0.55);
-  --texto: #fbeef4;
-  --texto-sub: #d9a9c2;
-  --borda: rgba(236, 72, 153, 0.22);
+  --bg: #150c29;
+  --bg-elevado: rgba(45, 24, 74, 0.5);
+  --texto: #f6f1ff;
+  --texto-sub: #c9b8f0;
+  --borda: rgba(167, 139, 250, 0.28);
   --acento: #f472b6;
-  --vidro-bg: rgba(255, 220, 236, 0.08);
-  --vidro-borda: rgba(244, 114, 182, 0.28);
-  --vidro-brilho: rgba(255, 210, 232, 0.22);
-  --vidro-sombra: rgba(80, 8, 45, 0.4);
+  --vidro-bg: rgba(255, 255, 255, 0.07);
+  --vidro-borda: rgba(196, 165, 255, 0.28);
+  --vidro-brilho: rgba(230, 210, 255, 0.22);
+  --vidro-sombra: rgba(20, 8, 45, 0.45);
+}
+
+body.tema-amo::before {
+  content: '';
+  position: fixed;
+  inset: -25%;
+  z-index: -1;
+  background:
+    radial-gradient(circle at 20% 25%, rgba(236, 72, 153, 0.55), transparent 40%),
+    radial-gradient(circle at 80% 15%, rgba(99, 102, 241, 0.55), transparent 42%),
+    radial-gradient(circle at 25% 80%, rgba(139, 92, 246, 0.5), transparent 45%),
+    radial-gradient(circle at 85% 80%, rgba(59, 130, 246, 0.4), transparent 45%),
+    linear-gradient(160deg, #1a0e33 0%, #2a1454 45%, #170a28 100%);
+  background-size: 160% 160%;
+  filter: blur(6px);
+  animation: liquidoAmo 26s ease-in-out infinite alternate;
+}
+
+@keyframes liquidoAmo {
+  0% { background-position: 0% 0%, 100% 0%, 0% 100%, 100% 100%, 50% 50%; transform: scale(1) rotate(0deg); }
+  50% { background-position: 35% 25%, 70% 35%, 25% 65%, 75% 70%, 50% 50%; transform: scale(1.1) rotate(3deg); }
+  100% { background-position: 10% 45%, 90% 5%, 45% 90%, 55% 55%, 50% 50%; transform: scale(1.02) rotate(-3deg); }
 }
 
 .tela {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   height: 100vh;

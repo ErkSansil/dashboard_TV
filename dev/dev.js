@@ -44,6 +44,7 @@ function preencherFormulario(config) {
   document.getElementById('campoTema').value = config.tema;
   document.getElementById('campoQtdLista').value = config.qtdLista;
   document.getElementById('campoVelocidadeScroll').value = config.velocidadeScroll;
+  document.getElementById('campoDuracaoFade').value = config.duracaoFadeSegundos;
   document.getElementById('campoRotuloExtra1').value = config.rotuloExtra1 || '';
   document.getElementById('campoRotuloExtra2').value = config.rotuloExtra2 || '';
 
@@ -110,6 +111,7 @@ function lerFormularioParaConfig() {
   config.tema = document.getElementById('campoTema').value;
   config.qtdLista = Number(document.getElementById('campoQtdLista').value);
   config.velocidadeScroll = Number(document.getElementById('campoVelocidadeScroll').value);
+  config.duracaoFadeSegundos = Number(document.getElementById('campoDuracaoFade').value);
 
   var fixadoValor = document.getElementById('campoFixado').value;
   config.fixado = fixadoValor ? { setor: fixadoValor.split('|')[0], periodo: fixadoValor.split('|')[1] } : null;

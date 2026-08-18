@@ -1,4 +1,4 @@
-var ESTADO = { config: null, indiceRotacao: 0, timerRotacao: null };
+var ESTADO = { config: null, indiceRotacao: 0, timerRotacao: null, timerFade: null, primeiraExibicao: true };
 
 function iniciar() {
   atualizarConfig(function () {
@@ -49,7 +49,7 @@ function mostrarSlideAtual(slide) {
     .then(function (resposta) { return resposta.json(); })
     .then(function (dados) {
       if (dados.ok) {
-        renderizar(slide, dados);
+        transicionarPara(function () { renderizar(slide, dados); });
       } else if (slide.modoTroca === 'scroll') {
         agendarAvancoFallback(slide);
       }
@@ -57,6 +57,42 @@ function mostrarSlideAtual(slide) {
     .catch(function () {
       if (slide.modoTroca === 'scroll') agendarAvancoFallback(slide);
     });
+}
+
+function elementosTransicao() {
+  return [
+    document.getElementById('rotuloSetor').parentElement,
+    document.getElementById('rotuloData'),
+    document.querySelector('.conteudo')
+  ];
+}
+
+function duracaoFadeMs(config) {
+  var valor = config && config.duracaoFadeSegundos;
+  return typeof valor === 'number' && valor >= 0 ? valor * 1000 : 600;
+}
+
+function transicionarPara(atualizarConteudo) {
+  var duracaoMs = duracaoFadeMs(ESTADO.config);
+  if (ESTADO.timerFade) {
+    clearTimeout(ESTADO.timerFade);
+    ESTADO.timerFade = null;
+  }
+  if (ESTADO.primeiraExibicao || duracaoMs <= 0) {
+    ESTADO.primeiraExibicao = false;
+    atualizarConteudo();
+    return;
+  }
+  var elementos = elementosTransicao();
+  elementos.forEach(function (el) {
+    el.style.transition = 'opacity ' + duracaoMs + 'ms ease';
+    el.style.opacity = '0';
+  });
+  ESTADO.timerFade = setTimeout(function () {
+    atualizarConteudo();
+    elementos.forEach(function (el) { void el.offsetHeight; });
+    elementos.forEach(function (el) { el.style.opacity = '1'; });
+  }, duracaoMs);
 }
 
 function agendarAvancoFallback(slide) {

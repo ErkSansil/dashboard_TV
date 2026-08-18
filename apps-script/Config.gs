@@ -5,6 +5,7 @@ function configPadrao() {
     tema: 'escuro',
     qtdLista: 7,
     velocidadeScroll: 22,
+    duracaoFadeSegundos: 0.6,
     metricasVisiveis: ['aproveitamento', 'vendasImediato', 'contratos'],
     rotuloExtra1: '',
     rotuloExtra2: '',
@@ -81,6 +82,9 @@ function validarConfig(config) {
   }
   if (typeof config.velocidadeScroll !== 'number' || config.velocidadeScroll <= 0) {
     erros.push('velocidadeScroll precisa ser um número maior que 0');
+  }
+  if (typeof config.duracaoFadeSegundos !== 'number' || config.duracaoFadeSegundos < 0) {
+    erros.push('duracaoFadeSegundos precisa ser um número maior ou igual a 0');
   }
   if (['claro', 'escuro', 'amo'].indexOf(config.tema) === -1) {
     erros.push('tema precisa ser "claro", "escuro" ou "amo"');
