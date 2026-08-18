@@ -11,6 +11,8 @@
 
 * { box-sizing: border-box; }
 
+[hidden] { display: none !important; }
+
 body { margin: 0; font-family: var(--fonte); background: var(--bg); color: var(--texto); }
 
 .tela-login { height: 100vh; display: flex; align-items: center; justify-content: center; }
