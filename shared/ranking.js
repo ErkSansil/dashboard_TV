@@ -4,6 +4,11 @@ if (typeof require !== 'undefined' && typeof toPercentNumber === 'undefined') {
   var parseNumberValue = _percent.parseNumberValue;
 }
 
+if (typeof require !== 'undefined' && typeof buildDriveImageUrl === 'undefined') {
+  var _drive = require('./drive.js');
+  var buildDriveImageUrl = _drive.buildDriveImageUrl;
+}
+
 function normalizeVendaRow(nome, aproveitamentoRaw, vendasImediatoRaw, contratosRaw) {
   return {
     nome: String(nome).trim(),
@@ -62,6 +67,33 @@ function dividirPodioEResto(ranking, qtdLista) {
   };
 }
 
+function normalizarChaveNome(nome) {
+  return String(nome).trim().toLowerCase();
+}
+
+function montarMapaFotos(linhasEquipe) {
+  var mapa = {};
+  for (var i = 0; i < linhasEquipe.length; i++) {
+    var linha = linhasEquipe[i];
+    var nome = linha[0];
+    var fotoRef = linha[2];
+    if (!nome) continue;
+    mapa[normalizarChaveNome(nome)] = buildDriveImageUrl(fotoRef);
+  }
+  return mapa;
+}
+
+function anexarFotos(ranking, mapaFotos) {
+  return ranking.map(function (pessoa) {
+    var copia = {};
+    for (var chave in pessoa) {
+      copia[chave] = pessoa[chave];
+    }
+    copia.foto = mapaFotos[normalizarChaveNome(pessoa.nome)] || '';
+    return copia;
+  });
+}
+
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     normalizeVendaRow: normalizeVendaRow,
@@ -69,6 +101,9 @@ if (typeof module !== 'undefined' && module.exports) {
     sortRanking: sortRanking,
     buildRankingComPosicoes: buildRankingComPosicoes,
     montarRanking: montarRanking,
-    dividirPodioEResto: dividirPodioEResto
+    dividirPodioEResto: dividirPodioEResto,
+    normalizarChaveNome: normalizarChaveNome,
+    montarMapaFotos: montarMapaFotos,
+    anexarFotos: anexarFotos
   };
 }

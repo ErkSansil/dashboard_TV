@@ -7,7 +7,10 @@ const {
   sortRanking,
   buildRankingComPosicoes,
   montarRanking,
-  dividirPodioEResto
+  dividirPodioEResto,
+  normalizarChaveNome,
+  montarMapaFotos,
+  anexarFotos
 } = require('../shared/ranking.js');
 
 test('normalizeVendaRow converte e limpa os campos de uma linha', () => {
@@ -80,4 +83,26 @@ test('dividirPodioEResto separa top 3 do restante limitado', () => {
   const { podio, resto } = dividirPodioEResto(ranking, 3);
   assert.equal(podio.length, 3);
   assert.deepEqual(resto.map((p) => p.posicao), [4, 5, 6]);
+});
+
+test('montarMapaFotos monta o mapa nome -> URL da foto', () => {
+  const linhas = [
+    ['Alice', 'vendas', '1AbCdEfGhIjKlMnOpQrSt'],
+    ['', '', '']
+  ];
+  const mapa = montarMapaFotos(linhas);
+  assert.equal(mapa['alice'], 'https://drive.google.com/thumbnail?id=1AbCdEfGhIjKlMnOpQrSt&sz=w500');
+});
+
+test('anexarFotos casa pelo nome ignorando maiúsculas/espaços', () => {
+  const ranking = [{ nome: ' Alice ', posicao: 1 }];
+  const mapa = { alice: 'https://exemplo.com/alice.jpg' };
+  const comFoto = anexarFotos(ranking, mapa);
+  assert.equal(comFoto[0].foto, 'https://exemplo.com/alice.jpg');
+});
+
+test('anexarFotos retorna string vazia quando não encontra a pessoa', () => {
+  const ranking = [{ nome: 'Sem Foto', posicao: 1 }];
+  const comFoto = anexarFotos(ranking, {});
+  assert.equal(comFoto[0].foto, '');
 });
