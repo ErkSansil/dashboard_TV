@@ -98,40 +98,8 @@
           <label class="campo-metricas__item"><input type="checkbox" id="metricaExtra2" /> <input type="text" id="campoRotuloExtra2" placeholder="Nome da métrica extra 2" class="campo-metricas__rotulo" /></label>
         </div>
       </div>
-      <fieldset class="campo-slide">
-        <legend>Requisito mínimo para o pódio</legend>
-        <label><input type="checkbox" id="campoRequisitoAtivo" /> Exigir um mínimo para entrar no top 3</label>
-        <label>Métrica considerada
-          <select id="campoRequisitoMetrica">
-            <option value="aproveitamento">Aproveitamento (%)</option>
-            <option value="vendasImediato">Vendas Imediato</option>
-            <option value="contratos">Contratos</option>
-            <option value="extra1">Extra 1</option>
-            <option value="extra2">Extra 2</option>
-          </select>
-        </label>
-        <label>Valor mínimo (ex: 60 = 60% se a métrica for Aproveitamento)
-          <input type="number" id="campoRequisitoValor" step="0.01" />
-        </label>
-        <p class="mensagem-status">Quem não atinge o mínimo não aparece no pódio, mas continua na lista, na posição real dele no ranking.</p>
-      </fieldset>
-      <fieldset class="campo-slide">
-        <legend>Requisito mínimo para aparecer no ranking</legend>
-        <label><input type="checkbox" id="campoRequisitoRankingAtivo" /> Exigir um mínimo para aparecer no ranking geral</label>
-        <label>Métrica considerada
-          <select id="campoRequisitoRankingMetrica">
-            <option value="aproveitamento">Aproveitamento (%)</option>
-            <option value="vendasImediato">Vendas Imediato</option>
-            <option value="contratos">Contratos</option>
-            <option value="extra1">Extra 1</option>
-            <option value="extra2">Extra 2</option>
-          </select>
-        </label>
-        <label>Valor mínimo
-          <input type="number" id="campoRequisitoRankingValor" step="0.01" />
-        </label>
-        <p class="mensagem-status">Quem não atinge esse mínimo não aparece em lugar nenhum (nem no pódio, nem na lista). É mais restritivo que o requisito do pódio acima.</p>
-      </fieldset>
+      <div id="blocoRequisitoPodio"></div>
+      <div id="blocoRequisitoRanking"></div>
       <div id="listaSlides"></div>
       <div class="barra-salvar" id="barraSalvar" hidden>
         <span class="barra-salvar__aviso">Alterações não salvas</span>

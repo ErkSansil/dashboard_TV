@@ -192,9 +192,14 @@ function metricasParaExibir(config) {
 
 function mensagemPodioVazio(config) {
   var requisito = config && config.requisitoPodio;
-  if (requisito && requisito.ativo) {
-    var info = infoMetrica(requisito.metrica, config);
-    return 'Ainda vazio — faltam ' + info.formatar(requisito.valorMinimo) + ' em ' + info.rotulo + ' pra alguém entrar aqui';
+  if (requisito && requisito.ativo && Array.isArray(requisito.condicoes)) {
+    var partes = requisito.condicoes
+      .filter(function (condicao, indice) { return indice === 0 || condicao.ativo; })
+      .map(function (condicao) {
+        var info = infoMetrica(condicao.metrica, config);
+        return info.formatar(condicao.valorMinimo) + ' em ' + info.rotulo;
+      });
+    return 'Ainda vazio — faltam ' + partes.join(' e ') + ' pra alguém entrar aqui';
   }
   return 'Ainda vazio — essa vaga tá esperando alguém';
 }

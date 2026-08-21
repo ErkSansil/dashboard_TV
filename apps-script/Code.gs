@@ -5,7 +5,7 @@ var ABA_EQUIPE = 'EQUIPE';
 var ABA_CONFIG = 'CONFIG';
 var ABA_CREDENCIAIS = 'CREDENCIAIS DEV';
 var CELULA_CONFIG_JSON = 'B2';
-var VERSAO_BACKEND = '2026-08-20-3';
+var VERSAO_BACKEND = '2026-08-21-1';
 
 function doGet(e) {
   var acao = e.parameter.action;

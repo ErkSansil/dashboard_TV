@@ -56,6 +56,36 @@ document.getElementById('formLogin').addEventListener('submit', function (evento
     });
 });
 
+function normalizarCondicao(recebida, padrao, comToggle) {
+  var normalizada = {
+    metrica: (recebida && recebida.metrica) || padrao.metrica,
+    valorMinimo: recebida && typeof recebida.valorMinimo === 'number' ? recebida.valorMinimo : padrao.valorMinimo
+  };
+  if (comToggle) {
+    normalizada.ativo = recebida && typeof recebida.ativo === 'boolean' ? recebida.ativo : padrao.ativo;
+  }
+  return normalizada;
+}
+
+function normalizarRequisito(recebido, padrao) {
+  if (!recebido) return JSON.parse(JSON.stringify(padrao));
+  var normalizado = { ativo: typeof recebido.ativo === 'boolean' ? recebido.ativo : padrao.ativo, condicoes: [] };
+  if (Array.isArray(recebido.condicoes) && recebido.condicoes.length === 3) {
+    normalizado.condicoes = [
+      normalizarCondicao(recebido.condicoes[0], padrao.condicoes[0], false),
+      normalizarCondicao(recebido.condicoes[1], padrao.condicoes[1], true),
+      normalizarCondicao(recebido.condicoes[2], padrao.condicoes[2], true)
+    ];
+  } else if (typeof recebido.metrica === 'string') {
+    // config salvo no formato antigo (uma unica condicao, sem lista) - migra pra condicao 1
+    normalizado.condicoes = JSON.parse(JSON.stringify(padrao.condicoes));
+    normalizado.condicoes[0] = normalizarCondicao(recebido, padrao.condicoes[0], false);
+  } else {
+    normalizado.condicoes = JSON.parse(JSON.stringify(padrao.condicoes));
+  }
+  return normalizado;
+}
+
 function mesclarComPadrao(configCarregado) {
   var mesclado = configPadrao();
   if (!configCarregado) return mesclado;
@@ -63,13 +93,7 @@ function mesclarComPadrao(configCarregado) {
     mesclado[chave] = configCarregado[chave];
   }
   ['requisitoPodio', 'requisitoRanking'].forEach(function (chaveRequisito) {
-    var padrao = configPadrao()[chaveRequisito];
-    var recebido = configCarregado[chaveRequisito] || {};
-    mesclado[chaveRequisito] = {
-      ativo: typeof recebido.ativo === 'boolean' ? recebido.ativo : padrao.ativo,
-      metrica: recebido.metrica || padrao.metrica,
-      valorMinimo: typeof recebido.valorMinimo === 'number' ? recebido.valorMinimo : padrao.valorMinimo
-    };
+    mesclado[chaveRequisito] = normalizarRequisito(configCarregado[chaveRequisito], configPadrao()[chaveRequisito]);
   });
   return mesclado;
 }
@@ -92,6 +116,84 @@ var METRICAS_CAMPO = [
   { chave: 'extra1', id: 'metricaExtra1' },
   { chave: 'extra2', id: 'metricaExtra2' }
 ];
+
+var METRICAS_REQUISITO = [
+  { valor: 'aproveitamento', rotulo: 'Aproveitamento (%)' },
+  { valor: 'vendasImediato', rotulo: 'Vendas Imediato' },
+  { valor: 'contratos', rotulo: 'Contratos' },
+  { valor: 'extra1', rotulo: 'Extra 1' },
+  { valor: 'extra2', rotulo: 'Extra 2' }
+];
+
+function opcoesMetricaRequisito(selecionada) {
+  return METRICAS_REQUISITO.map(function (m) {
+    return '<option value="' + m.valor + '"' + (m.valor === selecionada ? ' selected' : '') + '>' + m.rotulo + '</option>';
+  }).join('');
+}
+
+function renderizarCondicao(prefixo, indice, condicao, comToggle, rotulo) {
+  var idAtivo = prefixo + 'Ativo' + indice;
+  var idMetrica = prefixo + 'Metrica' + indice;
+  var idValor = prefixo + 'Valor' + indice;
+  var inativa = comToggle && !condicao.ativo;
+  var desabilitado = inativa ? 'disabled' : '';
+  var cabecalho = comToggle
+    ? '<label class="campo-requisito__toggle"><input type="checkbox" id="' + idAtivo + '" ' + (condicao.ativo ? 'checked' : '') + ' /> ' + rotulo + '</label>'
+    : '<span class="campo-requisito__toggle campo-requisito__toggle--fixo">' + rotulo + '</span>';
+  return (
+    '<div class="campo-requisito__condicao' + (comToggle ? '' : ' campo-requisito__condicao--fixa') + (inativa ? ' campo-requisito__condicao--inativa' : '') + '">' +
+      cabecalho +
+      '<label>Métrica considerada<select ' + desabilitado + ' id="' + idMetrica + '">' + opcoesMetricaRequisito(condicao.metrica) + '</select></label>' +
+      '<label>Valor mínimo<input type="number" ' + desabilitado + ' id="' + idValor + '" step="0.01" value="' + condicao.valorMinimo + '" /></label>' +
+    '</div>'
+  );
+}
+
+function atualizarEstadoCondicao(checkboxAtivo) {
+  var bloco = checkboxAtivo.closest('.campo-requisito__condicao');
+  if (!bloco) return;
+  var ativo = checkboxAtivo.checked;
+  bloco.classList.toggle('campo-requisito__condicao--inativa', !ativo);
+  bloco.querySelectorAll('select, input[type="number"]').forEach(function (campo) {
+    campo.disabled = !ativo;
+  });
+}
+
+function renderizarBlocoRequisito(containerId, prefixo, titulo, rotuloAtivo, requisito, textoExplicativo) {
+  var container = document.getElementById(containerId);
+  var condicoes = requisito.condicoes;
+  container.innerHTML =
+    '<fieldset class="campo-slide campo-requisito">' +
+      '<legend>' + titulo + '</legend>' +
+      '<label><input type="checkbox" id="' + prefixo + 'Ativo" ' + (requisito.ativo ? 'checked' : '') + ' /> ' + rotuloAtivo + '</label>' +
+      renderizarCondicao(prefixo, 0, condicoes[0], false, 'Condição 1 — sempre aplicada') +
+      renderizarCondicao(prefixo, 1, condicoes[1], true, 'Condição 2 (opcional)') +
+      renderizarCondicao(prefixo, 2, condicoes[2], true, 'Condição 3 (opcional)') +
+      '<p class="mensagem-status">' + textoExplicativo + '</p>' +
+    '</fieldset>';
+}
+
+function lerCondicao(prefixo, indice, comToggle) {
+  var condicao = {
+    metrica: document.getElementById(prefixo + 'Metrica' + indice).value,
+    valorMinimo: Number(document.getElementById(prefixo + 'Valor' + indice).value)
+  };
+  if (comToggle) {
+    condicao.ativo = document.getElementById(prefixo + 'Ativo' + indice).checked;
+  }
+  return condicao;
+}
+
+function lerRequisito(prefixo) {
+  return {
+    ativo: document.getElementById(prefixo + 'Ativo').checked,
+    condicoes: [
+      lerCondicao(prefixo, 0, false),
+      lerCondicao(prefixo, 1, true),
+      lerCondicao(prefixo, 2, true)
+    ]
+  };
+}
 
 function preencherFormulario(config) {
   document.getElementById('campoTema').value = config.tema;
@@ -124,15 +226,16 @@ function preencherFormulario(config) {
 
   document.getElementById('campoFixarAtePosicao').value = typeof config.fixarAtePosicao === 'number' ? config.fixarAtePosicao : 0;
 
-  var requisitoPodio = config.requisitoPodio || { ativo: false, metrica: 'aproveitamento', valorMinimo: 60 };
-  document.getElementById('campoRequisitoAtivo').checked = requisitoPodio.ativo === true;
-  document.getElementById('campoRequisitoMetrica').value = requisitoPodio.metrica;
-  document.getElementById('campoRequisitoValor').value = requisitoPodio.valorMinimo;
-
-  var requisitoRanking = config.requisitoRanking || { ativo: false, metrica: 'aproveitamento', valorMinimo: 0 };
-  document.getElementById('campoRequisitoRankingAtivo').checked = requisitoRanking.ativo === true;
-  document.getElementById('campoRequisitoRankingMetrica').value = requisitoRanking.metrica;
-  document.getElementById('campoRequisitoRankingValor').value = requisitoRanking.valorMinimo;
+  renderizarBlocoRequisito(
+    'blocoRequisitoPodio', 'campoRequisitoPodio', 'Requisito mínimo para o pódio',
+    'Exigir um mínimo para entrar no top 3', config.requisitoPodio,
+    'Quem não atinge todas as condições ativas não aparece no pódio, mas continua na lista, na posição real dele no ranking.'
+  );
+  renderizarBlocoRequisito(
+    'blocoRequisitoRanking', 'campoRequisitoRanking', 'Requisito mínimo para aparecer no ranking',
+    'Exigir um mínimo para aparecer no ranking geral', config.requisitoRanking,
+    'Quem não atinge todas as condições ativas não aparece em lugar nenhum (nem no pódio, nem na lista). É mais restritivo que o requisito do pódio acima.'
+  );
 
   var container = document.getElementById('listaSlides');
   container.innerHTML = '';
@@ -207,16 +310,8 @@ function lerFormularioParaConfig() {
   config.fixado = fixadoValor ? { setor: fixadoValor.split('|')[0], periodo: fixadoValor.split('|')[1] } : null;
 
   config.fixarAtePosicao = Number(document.getElementById('campoFixarAtePosicao').value);
-  config.requisitoPodio = {
-    ativo: document.getElementById('campoRequisitoAtivo').checked,
-    metrica: document.getElementById('campoRequisitoMetrica').value,
-    valorMinimo: Number(document.getElementById('campoRequisitoValor').value)
-  };
-  config.requisitoRanking = {
-    ativo: document.getElementById('campoRequisitoRankingAtivo').checked,
-    metrica: document.getElementById('campoRequisitoRankingMetrica').value,
-    valorMinimo: Number(document.getElementById('campoRequisitoRankingValor').value)
-  };
+  config.requisitoPodio = lerRequisito('campoRequisitoPodio');
+  config.requisitoRanking = lerRequisito('campoRequisitoRanking');
 
   config.metricasVisiveis = METRICAS_CAMPO
     .filter(function (item) { return document.getElementById(item.id).checked; })
@@ -251,9 +346,32 @@ function recarregarPreview() {
   iframe.src = iframe.src;
 }
 
+function igualProfundo(a, b) {
+  if (a === b) return true;
+  if (typeof a !== typeof b) return false;
+  if (a === null || b === null || typeof a !== 'object') return a === b;
+  if (Array.isArray(a) !== Array.isArray(b)) return false;
+  if (Array.isArray(a)) {
+    if (a.length !== b.length) return false;
+    for (var i = 0; i < a.length; i++) {
+      if (!igualProfundo(a[i], b[i])) return false;
+    }
+    return true;
+  }
+  var chavesA = Object.keys(a);
+  var chavesB = Object.keys(b);
+  if (chavesA.length !== chavesB.length) return false;
+  for (var j = 0; j < chavesA.length; j++) {
+    var chave = chavesA[j];
+    if (!Object.prototype.hasOwnProperty.call(b, chave)) return false;
+    if (!igualProfundo(a[chave], b[chave])) return false;
+  }
+  return true;
+}
+
 function formularioEstaSujo() {
   if (!CONFIG_ATUAL) return false;
-  return JSON.stringify(lerFormularioParaConfig()) !== JSON.stringify(CONFIG_ATUAL);
+  return !igualProfundo(lerFormularioParaConfig(), CONFIG_ATUAL);
 }
 
 function verificarAlteracoes() {
@@ -269,6 +387,9 @@ document.getElementById('telaConfig').addEventListener('change', function (event
   document.getElementById('mensagemSalvar').textContent = '';
   if (evento.target.matches('[data-campo="ativo"]')) {
     atualizarEstadoAtivoSlide(evento.target);
+  }
+  if (evento.target.matches('.campo-requisito__toggle input[type="checkbox"]')) {
+    atualizarEstadoCondicao(evento.target);
   }
 });
 

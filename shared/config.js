@@ -2,6 +2,17 @@ var METRICAS_DISPONIVEIS = ['aproveitamento', 'vendasImediato', 'contratos', 'ex
 var TEMAS_DISPONIVEIS = ['escuro', 'claro', 'amo', 'aurora', 'sunset', 'oceano', 'platina', 'fogo', 'meianoite'];
 var ESTILOS_FUNDO = ['fosco', 'brilhante'];
 
+function requisitoPadrao(valorMinimoPrimeira) {
+  return {
+    ativo: false,
+    condicoes: [
+      { metrica: 'aproveitamento', valorMinimo: valorMinimoPrimeira },
+      { ativo: false, metrica: 'aproveitamento', valorMinimo: 0 },
+      { ativo: false, metrica: 'aproveitamento', valorMinimo: 0 }
+    ]
+  };
+}
+
 function configPadrao() {
   return {
     tema: 'escuro',
@@ -19,8 +30,8 @@ function configPadrao() {
     rotuloExtra2: '',
     fixado: null,
     fixarAtePosicao: 0,
-    requisitoPodio: { ativo: false, metrica: 'aproveitamento', valorMinimo: 60 },
-    requisitoRanking: { ativo: false, metrica: 'aproveitamento', valorMinimo: 0 },
+    requisitoPodio: requisitoPadrao(60),
+    requisitoRanking: requisitoPadrao(0),
     slides: [
       {
         chave: 'vendas-dia', setor: 'vendas', periodo: 'dia', ativo: true, duracaoSegundos: 20,
@@ -56,6 +67,31 @@ function configPadrao() {
 
 var CAMPOS_ORDENAVEIS = ['aproveitamento', 'vendasImediato', 'contratos', 'nome'];
 var MODOS_TROCA = ['tempo', 'scroll'];
+
+function validarRequisito(requisito, nomeCampo, erros) {
+  if (!requisito || typeof requisito !== 'object') {
+    erros.push(nomeCampo + ' precisa ser um objeto com ativo e condicoes');
+    return;
+  }
+  if (typeof requisito.ativo !== 'boolean') {
+    erros.push(nomeCampo + '.ativo precisa ser true ou false');
+  }
+  if (!Array.isArray(requisito.condicoes) || requisito.condicoes.length !== 3) {
+    erros.push(nomeCampo + '.condicoes precisa ser uma lista com exatamente 3 itens');
+    return;
+  }
+  requisito.condicoes.forEach(function (condicao, indice) {
+    if (METRICAS_DISPONIVEIS.indexOf(condicao.metrica) === -1) {
+      erros.push(nomeCampo + '.condicoes[' + indice + '].metrica precisa ser uma das: ' + METRICAS_DISPONIVEIS.join(', '));
+    }
+    if (typeof condicao.valorMinimo !== 'number') {
+      erros.push(nomeCampo + '.condicoes[' + indice + '].valorMinimo precisa ser um número');
+    }
+    if (indice > 0 && typeof condicao.ativo !== 'boolean') {
+      erros.push(nomeCampo + '.condicoes[' + indice + '].ativo precisa ser true ou false');
+    }
+  });
+}
 
 function validarConfig(config) {
   var erros = [];
@@ -130,38 +166,15 @@ function validarConfig(config) {
   if (typeof config.fixarAtePosicao !== 'number' || config.fixarAtePosicao < 0) {
     erros.push('fixarAtePosicao precisa ser um número maior ou igual a 0 (0 = nenhuma fixa)');
   }
-  if (!config.requisitoPodio || typeof config.requisitoPodio !== 'object') {
-    erros.push('requisitoPodio precisa ser um objeto com ativo, metrica e valorMinimo');
-  } else {
-    if (typeof config.requisitoPodio.ativo !== 'boolean') {
-      erros.push('requisitoPodio.ativo precisa ser true ou false');
-    }
-    if (METRICAS_DISPONIVEIS.indexOf(config.requisitoPodio.metrica) === -1) {
-      erros.push('requisitoPodio.metrica precisa ser uma das: ' + METRICAS_DISPONIVEIS.join(', '));
-    }
-    if (typeof config.requisitoPodio.valorMinimo !== 'number') {
-      erros.push('requisitoPodio.valorMinimo precisa ser um número');
-    }
-  }
-  if (!config.requisitoRanking || typeof config.requisitoRanking !== 'object') {
-    erros.push('requisitoRanking precisa ser um objeto com ativo, metrica e valorMinimo');
-  } else {
-    if (typeof config.requisitoRanking.ativo !== 'boolean') {
-      erros.push('requisitoRanking.ativo precisa ser true ou false');
-    }
-    if (METRICAS_DISPONIVEIS.indexOf(config.requisitoRanking.metrica) === -1) {
-      erros.push('requisitoRanking.metrica precisa ser uma das: ' + METRICAS_DISPONIVEIS.join(', '));
-    }
-    if (typeof config.requisitoRanking.valorMinimo !== 'number') {
-      erros.push('requisitoRanking.valorMinimo precisa ser um número');
-    }
-  }
+  validarRequisito(config.requisitoPodio, 'requisitoPodio', erros);
+  validarRequisito(config.requisitoRanking, 'requisitoRanking', erros);
   return { valido: erros.length === 0, erros: erros };
 }
 
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     configPadrao: configPadrao,
+    requisitoPadrao: requisitoPadrao,
     validarConfig: validarConfig,
     TEMAS_DISPONIVEIS: TEMAS_DISPONIVEIS,
     ESTILOS_FUNDO: ESTILOS_FUNDO

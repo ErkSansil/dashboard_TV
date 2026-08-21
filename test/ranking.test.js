@@ -106,6 +106,21 @@ test('dividirPodioEResto separa top 3 do restante limitado', () => {
   assert.deepEqual(resto.map((p) => p.posicao), [4, 5, 6]);
 });
 
+function condicaoUnica(metrica, valorMinimo) {
+  return { metrica, valorMinimo };
+}
+
+function requisitoComUmaCondicao(metrica, valorMinimo) {
+  return {
+    ativo: true,
+    condicoes: [
+      condicaoUnica(metrica, valorMinimo),
+      { ativo: false, metrica: 'aproveitamento', valorMinimo: 0 },
+      { ativo: false, metrica: 'aproveitamento', valorMinimo: 0 }
+    ]
+  };
+}
+
 test('dividirPodioEResto sem requisito ativo mantém o comportamento padrão', () => {
   const ranking = [
     { nome: 'A', aproveitamento: 90 },
@@ -113,7 +128,8 @@ test('dividirPodioEResto sem requisito ativo mantém o comportamento padrão', (
     { nome: 'C', aproveitamento: 70 },
     { nome: 'D', aproveitamento: 60 }
   ];
-  const { podio, resto } = dividirPodioEResto(ranking, 5, { ativo: false, metrica: 'aproveitamento', valorMinimo: 999 });
+  const requisito = { ativo: false, condicoes: [condicaoUnica('aproveitamento', 999), { ativo: false, metrica: 'aproveitamento', valorMinimo: 0 }, { ativo: false, metrica: 'aproveitamento', valorMinimo: 0 }] };
+  const { podio, resto } = dividirPodioEResto(ranking, 5, requisito);
   assert.deepEqual(podio.map((p) => p.nome), ['A', 'B', 'C']);
   assert.deepEqual(resto.map((p) => p.nome), ['D']);
 });
@@ -125,7 +141,7 @@ test('dividirPodioEResto pula quem não atinge o requisito mínimo, mas mantém 
     { nome: 'C', aproveitamento: 70 },
     { nome: 'D', aproveitamento: 65 }
   ];
-  const requisito = { ativo: true, metrica: 'aproveitamento', valorMinimo: 60 };
+  const requisito = requisitoComUmaCondicao('aproveitamento', 60);
   const { podio, resto } = dividirPodioEResto(ranking, 5, requisito);
   assert.deepEqual(podio.map((p) => p.nome), ['A', 'C', 'D']);
   assert.deepEqual(resto.map((p) => p.nome), ['B']);
@@ -137,7 +153,7 @@ test('dividirPodioEResto renumera a posicao exibida após aplicar o requisito', 
     { nome: 'B', aproveitamento: 50 },
     { nome: 'C', aproveitamento: 70 }
   ];
-  const requisito = { ativo: true, metrica: 'aproveitamento', valorMinimo: 60 };
+  const requisito = requisitoComUmaCondicao('aproveitamento', 60);
   const { podio, resto } = dividirPodioEResto(ranking, 5, requisito);
   assert.deepEqual(podio.map((p) => p.posicao), [1, 2]);
   assert.deepEqual(resto.map((p) => p.posicao), [3]);
@@ -145,10 +161,43 @@ test('dividirPodioEResto renumera a posicao exibida após aplicar o requisito', 
 
 test('dividirPodioEResto trata pessoa sem a métrica do requisito como não qualificada', () => {
   const ranking = [{ nome: 'A', aproveitamento: null }, { nome: 'B', aproveitamento: 90 }];
-  const requisito = { ativo: true, metrica: 'aproveitamento', valorMinimo: 60 };
+  const requisito = requisitoComUmaCondicao('aproveitamento', 60);
   const { podio, resto } = dividirPodioEResto(ranking, 5, requisito);
   assert.deepEqual(podio.map((p) => p.nome), ['B']);
   assert.deepEqual(resto.map((p) => p.nome), ['A']);
+});
+
+test('dividirPodioEResto exige TODAS as condicoes ativas ao mesmo tempo (E lógico)', () => {
+  const ranking = [
+    { nome: 'A', aproveitamento: 90, contratos: 1 },
+    { nome: 'B', aproveitamento: 90, contratos: 5 },
+    { nome: 'C', aproveitamento: 40, contratos: 5 }
+  ];
+  const requisito = {
+    ativo: true,
+    condicoes: [
+      condicaoUnica('aproveitamento', 60),
+      { ativo: true, metrica: 'contratos', valorMinimo: 3 },
+      { ativo: false, metrica: 'aproveitamento', valorMinimo: 0 }
+    ]
+  };
+  const { podio, resto } = dividirPodioEResto(ranking, 5, requisito);
+  assert.deepEqual(podio.map((p) => p.nome), ['B']);
+  assert.deepEqual(resto.map((p) => p.nome), ['A', 'C']);
+});
+
+test('dividirPodioEResto ignora condicao 2/3 quando ela mesma está desativada', () => {
+  const ranking = [{ nome: 'A', aproveitamento: 90, contratos: 0 }];
+  const requisito = {
+    ativo: true,
+    condicoes: [
+      condicaoUnica('aproveitamento', 60),
+      { ativo: false, metrica: 'contratos', valorMinimo: 99 },
+      { ativo: false, metrica: 'aproveitamento', valorMinimo: 0 }
+    ]
+  };
+  const { podio } = dividirPodioEResto(ranking, 5, requisito);
+  assert.deepEqual(podio.map((p) => p.nome), ['A']);
 });
 
 test('montarMapaFotos monta o mapa nome -> URL da foto', () => {
@@ -197,13 +246,31 @@ test('filtrarPorRequisitoRanking remove quem não atinge o mínimo, ficando fora
     { nome: 'Bruna', aproveitamento: 20 },
     { nome: 'Carla', aproveitamento: 60 }
   ];
-  const requisito = { ativo: true, metrica: 'aproveitamento', valorMinimo: 60 };
+  const requisito = requisitoComUmaCondicao('aproveitamento', 60);
   const filtradas = filtrarPorRequisitoRanking(pessoas, requisito);
   assert.deepEqual(filtradas.map((p) => p.nome), ['Alice', 'Carla']);
 });
 
 test('filtrarPorRequisitoRanking não filtra nada quando inativo', () => {
   const pessoas = [{ nome: 'Alice', aproveitamento: 5 }];
-  const filtradas = filtrarPorRequisitoRanking(pessoas, { ativo: false, metrica: 'aproveitamento', valorMinimo: 60 });
+  const requisito = { ativo: false, condicoes: [condicaoUnica('aproveitamento', 60), { ativo: false, metrica: 'aproveitamento', valorMinimo: 0 }, { ativo: false, metrica: 'aproveitamento', valorMinimo: 0 }] };
+  const filtradas = filtrarPorRequisitoRanking(pessoas, requisito);
   assert.deepEqual(filtradas, pessoas);
+});
+
+test('filtrarPorRequisitoRanking exige as duas condicoes ativas ao mesmo tempo', () => {
+  const pessoas = [
+    { nome: 'Alice', aproveitamento: 90, contratos: 1 },
+    { nome: 'Bruna', aproveitamento: 90, contratos: 4 }
+  ];
+  const requisito = {
+    ativo: true,
+    condicoes: [
+      condicaoUnica('aproveitamento', 60),
+      { ativo: true, metrica: 'contratos', valorMinimo: 3 },
+      { ativo: false, metrica: 'aproveitamento', valorMinimo: 0 }
+    ]
+  };
+  const filtradas = filtrarPorRequisitoRanking(pessoas, requisito);
+  assert.deepEqual(filtradas.map((p) => p.nome), ['Bruna']);
 });

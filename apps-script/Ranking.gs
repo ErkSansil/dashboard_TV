@@ -80,11 +80,21 @@ function montarRanking(pessoas, ordenarPor, direcao) {
   return buildRankingComPosicoes(sortRanking(pessoas, ordenarPor, direcao));
 }
 
-function pessoaAtendeRequisito(pessoa, requisitoPodio) {
-  if (!requisitoPodio || !requisitoPodio.ativo) return true;
-  var valor = pessoa[requisitoPodio.metrica];
+function condicaoAtendida(pessoa, condicao) {
+  var valor = pessoa[condicao.metrica];
   if (valor === null || valor === undefined) return false;
-  return valor >= requisitoPodio.valorMinimo;
+  return valor >= condicao.valorMinimo;
+}
+
+function pessoaAtendeRequisito(pessoa, requisito) {
+  if (!requisito || !requisito.ativo) return true;
+  var condicoes = requisito.condicoes || [];
+  for (var i = 0; i < condicoes.length; i++) {
+    var condicao = condicoes[i];
+    if (i > 0 && !condicao.ativo) continue;
+    if (!condicaoAtendida(pessoa, condicao)) return false;
+  }
+  return true;
 }
 
 function dividirPodioEResto(ranking, qtdLista, requisitoPodio) {
@@ -147,6 +157,7 @@ if (typeof module !== 'undefined' && module.exports) {
     sortRanking: sortRanking,
     buildRankingComPosicoes: buildRankingComPosicoes,
     montarRanking: montarRanking,
+    condicaoAtendida: condicaoAtendida,
     pessoaAtendeRequisito: pessoaAtendeRequisito,
     dividirPodioEResto: dividirPodioEResto,
     normalizarChaveNome: normalizarChaveNome,

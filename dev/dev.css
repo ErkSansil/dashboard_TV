@@ -211,6 +211,31 @@ h1, h2 { font-family: var(--fonte-display); }
 
 .campo-slide label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.8rem; color: var(--texto-sub); font-weight: 500; }
 .campo-slide label:has(input[type="checkbox"]) { flex-direction: row; align-items: center; gap: 0.5rem; }
+
+.campo-requisito__condicao {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.7rem;
+  border: 1px dashed var(--borda);
+  border-radius: 10px;
+  transition: opacity 0.15s ease;
+}
+.campo-requisito__condicao--fixa {
+  border-style: solid;
+  background: rgba(236, 72, 153, 0.04);
+}
+.campo-requisito__condicao--inativa { opacity: 0.5; }
+
+.campo-requisito__toggle {
+  font-weight: 700 !important;
+  color: var(--texto) !important;
+}
+.campo-requisito__toggle--fixo {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--acento-escuro);
+}
 .campo-slide input, .campo-slide select {
   padding: 0.45rem 0.6rem;
   border-radius: 8px;
