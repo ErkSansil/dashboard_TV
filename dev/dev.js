@@ -94,15 +94,22 @@ function mesclarComPadrao(configCarregado) {
   // pra todos os períodos) - se um slide ainda não tiver o dele próprio, usa esse como ponto de partida
   var requisitoPodioGlobalAntigo = configCarregado.requisitoPodio;
   var requisitoRankingGlobalAntigo = configCarregado.requisitoRanking;
+  // metricasVisiveis também já existiu no nível raiz (a mesma métrica visível em todas as telas) -
+  // se um slide ainda não tiver a dele própria, usa essa como ponto de partida
+  var metricasVisiveisGlobalAntigo = Array.isArray(configCarregado.metricasVisiveis) ? configCarregado.metricasVisiveis : null;
   for (var chave in configCarregado) {
     mesclado[chave] = configCarregado[chave];
   }
   delete mesclado.requisitoPodio;
   delete mesclado.requisitoRanking;
+  delete mesclado.metricasVisiveis;
   mesclado.slides = (mesclado.slides || []).map(function (slide) {
     var copia = {};
     for (var campo in slide) copia[campo] = slide[campo];
     copia.temaProprio = typeof slide.temaProprio === 'string' ? slide.temaProprio : '';
+    copia.metricasVisiveis = Array.isArray(slide.metricasVisiveis) && slide.metricasVisiveis.length > 0
+      ? slide.metricasVisiveis
+      : (metricasVisiveisGlobalAntigo || ['aproveitamento', 'vendasImediato', 'contratos']);
     if (slide.setor === 'metas') {
       copia.meta = normalizarRequisito(slide.meta, metaPadrao(5));
       copia.quantidadeCards = typeof slide.quantidadeCards === 'number' && slide.quantidadeCards > 0 ? slide.quantidadeCards : 6;
@@ -132,13 +139,21 @@ function carregarConfig() {
     });
 }
 
-var METRICAS_CAMPO = [
-  { chave: 'aproveitamento', id: 'metricaAproveitamento' },
-  { chave: 'vendasImediato', id: 'metricaVendasImediato' },
-  { chave: 'contratos', id: 'metricaContratos' },
-  { chave: 'extra1', id: 'metricaExtra1' },
-  { chave: 'extra2', id: 'metricaExtra2' }
-];
+function htmlCamposMetricas(indice, metricasVisiveis, rotuloExtra1, rotuloExtra2, desabilitado) {
+  var visiveis = metricasVisiveis || [];
+  var itens = [
+    { chave: 'aproveitamento', rotulo: 'Aproveitamento (%)' },
+    { chave: 'vendasImediato', rotulo: 'Vendas Imediato' },
+    { chave: 'contratos', rotulo: 'Contratos' },
+    { chave: 'extra1', rotulo: rotuloExtra1 || 'Extra 1' },
+    { chave: 'extra2', rotulo: rotuloExtra2 || 'Extra 2' }
+  ];
+  var checkboxesHtml = itens.map(function (item) {
+    var marcado = visiveis.indexOf(item.chave) !== -1 ? 'checked' : '';
+    return '<label class="campo-metricas__item"><input type="checkbox" ' + desabilitado + ' data-indice="' + indice + '" data-campo="metrica.' + item.chave + '" ' + marcado + ' /> ' + item.rotulo + '</label>';
+  }).join('');
+  return '<label>Métricas exibidas nesta tela<div class="campo-metricas">' + checkboxesHtml + '</div></label>';
+}
 
 var TEMAS_OPCOES = [
   { valor: 'escuro', rotulo: 'Escuro (neutro, sem animação)' },
@@ -269,11 +284,6 @@ function preencherFormulario(config) {
   document.getElementById('campoRotuloExtra1').value = config.rotuloExtra1 || '';
   document.getElementById('campoRotuloExtra2').value = config.rotuloExtra2 || '';
 
-  var metricasVisiveis = config.metricasVisiveis || [];
-  METRICAS_CAMPO.forEach(function (item) {
-    document.getElementById(item.id).checked = metricasVisiveis.indexOf(item.chave) !== -1;
-  });
-
   var seletorFixado = document.getElementById('campoFixado');
   seletorFixado.innerHTML = '<option value="">Rodízio normal</option>';
   config.slides.forEach(function (slide) {
@@ -310,7 +320,8 @@ function preencherFormulario(config) {
       '<label>Coluna Vendas Imediato <input type="text" ' + desabilitado + ' data-indice="' + indice + '" data-campo="colunas.vendasImediato" value="' + slide.colunas.vendasImediato + '" /></label>' +
       '<label>Coluna Contratos <input type="text" ' + desabilitado + ' data-indice="' + indice + '" data-campo="colunas.contratos" value="' + slide.colunas.contratos + '" /></label>' +
       '<label>Coluna Extra 1 <input type="text" ' + desabilitado + ' data-indice="' + indice + '" data-campo="colunas.extra1" value="' + (slide.colunas.extra1 || '') + '" /></label>' +
-      '<label>Coluna Extra 2 <input type="text" ' + desabilitado + ' data-indice="' + indice + '" data-campo="colunas.extra2" value="' + (slide.colunas.extra2 || '') + '" /></label>';
+      '<label>Coluna Extra 2 <input type="text" ' + desabilitado + ' data-indice="' + indice + '" data-campo="colunas.extra2" value="' + (slide.colunas.extra2 || '') + '" /></label>' +
+      htmlCamposMetricas(indice, slide.metricasVisiveis, config.rotuloExtra1, config.rotuloExtra2, desabilitado);
 
     var camposEspecificos;
     if (ehMetas) {
@@ -391,13 +402,10 @@ function lerFormularioParaConfig() {
 
   config.fixarAtePosicao = Number(document.getElementById('campoFixarAtePosicao').value);
 
-  config.metricasVisiveis = METRICAS_CAMPO
-    .filter(function (item) { return document.getElementById(item.id).checked; })
-    .map(function (item) { return item.chave; });
   config.rotuloExtra1 = document.getElementById('campoRotuloExtra1').value.trim();
   config.rotuloExtra2 = document.getElementById('campoRotuloExtra2').value.trim();
 
-  document.querySelectorAll('#listaSlides [data-indice]').forEach(function (campo) {
+  document.querySelectorAll('#listaSlides [data-indice]:not([data-campo^="metrica."])').forEach(function (campo) {
     var indice = Number(campo.getAttribute('data-indice'));
     var nomeCampo = campo.getAttribute('data-campo');
     var slide = config.slides[indice];
@@ -417,6 +425,11 @@ function lerFormularioParaConfig() {
   });
 
   config.slides.forEach(function (slide, indice) {
+    var checkboxesMetrica = document.querySelectorAll('#listaSlides [data-indice="' + indice + '"][data-campo^="metrica."]');
+    slide.metricasVisiveis = Array.from(checkboxesMetrica)
+      .filter(function (campo) { return campo.checked; })
+      .map(function (campo) { return campo.getAttribute('data-campo').split('.')[1]; });
+
     if (slide.setor === 'metas') {
       slide.meta = lerRequisito('campoMeta' + indice);
     } else {

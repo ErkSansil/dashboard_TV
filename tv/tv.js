@@ -173,7 +173,7 @@ function renderizar(slide, dados) {
   elPeriodo.textContent = nomePeriodo(slide.periodo);
   elPeriodo.className = 'cabecalho__periodo cabecalho__periodo--' + slide.periodo;
   document.getElementById('rotuloData').textContent = dados.rotulo || '';
-  var metricas = metricasParaExibir(ESTADO.config);
+  var metricas = metricasParaExibir(slide);
   renderizarPodio(dados.podio, metricas, ESTADO.config, slide.requisitoPodio);
   renderizarLista(dados.resto, metricas, ESTADO.config, slide);
 }
@@ -207,8 +207,8 @@ function infoMetrica(chave, config) {
   return METRICA_INFO[chave];
 }
 
-function metricasParaExibir(config) {
-  var metricas = config && Array.isArray(config.metricasVisiveis) ? config.metricasVisiveis : null;
+function metricasParaExibir(slide) {
+  var metricas = slide && Array.isArray(slide.metricasVisiveis) ? slide.metricasVisiveis : null;
   return metricas && metricas.length > 0 ? metricas : ['aproveitamento'];
 }
 
@@ -327,7 +327,7 @@ function renderizarMetas(slide, dados) {
   var conquistadores = dados.conquistadores || [];
   var quantidadeMinima = typeof dados.quantidadeCards === 'number' ? dados.quantidadeCards : 6;
   var totalCards = Math.max(quantidadeMinima, conquistadores.length);
-  var metricasSecundarias = metricasParaExibir(ESTADO.config).filter(function (m) { return m !== 'contratos'; });
+  var metricasSecundarias = metricasParaExibir(slide).filter(function (m) { return m !== 'contratos'; });
 
   for (var i = 0; i < totalCards; i++) {
     var pessoa = conquistadores[i];

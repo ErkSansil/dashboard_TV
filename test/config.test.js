@@ -71,32 +71,42 @@ test('validarConfig rejeita tema desconhecido', () => {
   assert.ok(resultado.erros.some((e) => e.includes('tema')));
 });
 
-test('configPadrao vem com as 3 métricas visíveis por padrão', () => {
+test('configPadrao vem com as 3 métricas visíveis por padrão em cada slide de vendas', () => {
   const config = configPadrao();
-  assert.deepEqual(config.metricasVisiveis, ['aproveitamento', 'vendasImediato', 'contratos']);
+  config.slides.filter((s) => s.setor === 'vendas').forEach((slide) => {
+    assert.deepEqual(slide.metricasVisiveis, ['aproveitamento', 'vendasImediato', 'contratos']);
+  });
 });
 
-test('validarConfig aceita apenas 1 métrica visível', () => {
+test('validarConfig aceita apenas 1 métrica visível num slide', () => {
   const config = configPadrao();
-  config.metricasVisiveis = ['aproveitamento'];
+  config.slides[0].metricasVisiveis = ['aproveitamento'];
   const resultado = validarConfig(config);
   assert.equal(resultado.valido, true);
 });
 
-test('validarConfig rejeita metricasVisiveis vazio', () => {
+test('validarConfig rejeita metricasVisiveis vazio num slide', () => {
   const config = configPadrao();
-  config.metricasVisiveis = [];
+  config.slides[0].metricasVisiveis = [];
   const resultado = validarConfig(config);
   assert.equal(resultado.valido, false);
   assert.ok(resultado.erros.some((e) => e.includes('metricasVisiveis')));
 });
 
-test('validarConfig rejeita métrica desconhecida em metricasVisiveis', () => {
+test('validarConfig rejeita métrica desconhecida em metricasVisiveis de um slide', () => {
   const config = configPadrao();
-  config.metricasVisiveis = ['aproveitamento', 'campo-fantasma'];
+  config.slides[0].metricasVisiveis = ['aproveitamento', 'campo-fantasma'];
   const resultado = validarConfig(config);
   assert.equal(resultado.valido, false);
   assert.ok(resultado.erros.some((e) => e.includes('metricasVisiveis')));
+});
+
+test('validarConfig permite metricasVisiveis diferentes entre slides', () => {
+  const config = configPadrao();
+  config.slides[0].metricasVisiveis = ['aproveitamento'];
+  config.slides[1].metricasVisiveis = ['contratos', 'vendasImediato'];
+  assert.equal(validarConfig(config).valido, true);
+  assert.notDeepEqual(config.slides[0].metricasVisiveis, config.slides[1].metricasVisiveis);
 });
 
 test('configPadrao já reserva colunas extra1/extra2 para dia, semana e mes', () => {
@@ -115,7 +125,7 @@ test('configPadrao vem com rótulos de extra vazios (ainda não usados)', () => 
 
 test('validarConfig aceita extra1/extra2 em metricasVisiveis', () => {
   const config = configPadrao();
-  config.metricasVisiveis = ['aproveitamento', 'extra1', 'extra2'];
+  config.slides[0].metricasVisiveis = ['aproveitamento', 'extra1', 'extra2'];
   const resultado = validarConfig(config);
   assert.equal(resultado.valido, true);
 });

@@ -32,7 +32,6 @@ function configPadrao() {
     escalaLista: 100,
     alturaPodioVh: 34,
     nomesExcluidos: [],
-    metricasVisiveis: ['aproveitamento', 'vendasImediato', 'contratos'],
     rotuloExtra1: '',
     rotuloExtra2: '',
     fixado: null,
@@ -44,6 +43,7 @@ function configPadrao() {
         linhaInicial: 4,
         colunas: { nome: 'E', aproveitamento: 'F', vendasImediato: 'G', contratos: 'H', extra1: 'I', extra2: 'J' },
         rotuloCelulas: ['F2'], ordenarPor: 'aproveitamento', direcao: 'desc', temaProprio: '',
+        metricasVisiveis: ['aproveitamento', 'vendasImediato', 'contratos'],
         requisitoPodio: requisitoPadrao(60), requisitoRanking: requisitoPadrao(0)
       },
       {
@@ -52,6 +52,7 @@ function configPadrao() {
         linhaInicial: 4,
         colunas: { nome: 'P', aproveitamento: 'Q', vendasImediato: 'R', contratos: 'S', extra1: 'T', extra2: 'U' },
         rotuloCelulas: ['Q2', 'R2'], ordenarPor: 'aproveitamento', direcao: 'desc', temaProprio: '',
+        metricasVisiveis: ['aproveitamento', 'vendasImediato', 'contratos'],
         requisitoPodio: requisitoPadrao(60), requisitoRanking: requisitoPadrao(0)
       },
       {
@@ -60,6 +61,7 @@ function configPadrao() {
         linhaInicial: 4,
         colunas: { nome: 'AA', aproveitamento: 'AB', vendasImediato: 'AC', contratos: 'AD', extra1: 'AE', extra2: 'AF' },
         rotuloCelulas: ['AA2', 'AB2', 'AC2'], ordenarPor: 'aproveitamento', direcao: 'desc', temaProprio: '',
+        metricasVisiveis: ['aproveitamento', 'vendasImediato', 'contratos'],
         requisitoPodio: requisitoPadrao(60), requisitoRanking: requisitoPadrao(0)
       },
       {
@@ -68,6 +70,7 @@ function configPadrao() {
         linhaInicial: 4,
         colunas: { nome: '', aproveitamento: '', vendasImediato: '', contratos: '', extra1: '', extra2: '' },
         rotuloCelulas: [], ordenarPor: 'aproveitamento', direcao: 'desc', temaProprio: '',
+        metricasVisiveis: ['aproveitamento', 'vendasImediato', 'contratos'],
         requisitoPodio: requisitoPadrao(60), requisitoRanking: requisitoPadrao(0)
       },
       {
@@ -76,6 +79,7 @@ function configPadrao() {
         linhaInicial: 4,
         colunas: { nome: 'E', aproveitamento: 'F', vendasImediato: 'G', contratos: 'H', extra1: 'I', extra2: 'J' },
         rotuloCelulas: ['F2'], ordenarPor: 'aproveitamento', direcao: 'desc', temaProprio: '',
+        metricasVisiveis: ['aproveitamento', 'vendasImediato'],
         quantidadeCards: 6, meta: metaPadrao(5)
       }
     ]
@@ -142,6 +146,15 @@ function validarConfig(config) {
       if (slide.temaProprio && TEMAS_DISPONIVEIS.indexOf(slide.temaProprio) === -1) {
         erros.push('slide ' + indice + ': temaProprio precisa ser vazio (usa o global) ou um dos: ' + TEMAS_DISPONIVEIS.join(', '));
       }
+      if (!Array.isArray(slide.metricasVisiveis) || slide.metricasVisiveis.length === 0) {
+        erros.push('slide ' + indice + ': metricasVisiveis precisa ser uma lista com pelo menos 1 item');
+      } else {
+        slide.metricasVisiveis.forEach(function (metrica) {
+          if (METRICAS_DISPONIVEIS.indexOf(metrica) === -1) {
+            erros.push('slide ' + indice + ': metricasVisiveis contém um valor inválido: ' + metrica);
+          }
+        });
+      }
       if (slide.setor === 'metas') {
         if (typeof slide.quantidadeCards !== 'number' || slide.quantidadeCards <= 0) {
           erros.push('slide ' + indice + ': quantidadeCards precisa ser um número maior que 0');
@@ -182,15 +195,6 @@ function validarConfig(config) {
   }
   if (ESTILOS_FUNDO.indexOf(config.fundoBrilho) === -1) {
     erros.push('fundoBrilho precisa ser "fosco" ou "brilhante"');
-  }
-  if (!Array.isArray(config.metricasVisiveis) || config.metricasVisiveis.length === 0) {
-    erros.push('metricasVisiveis precisa ser uma lista com pelo menos 1 item');
-  } else {
-    config.metricasVisiveis.forEach(function (metrica) {
-      if (METRICAS_DISPONIVEIS.indexOf(metrica) === -1) {
-        erros.push('metricasVisiveis contém um valor inválido: ' + metrica);
-      }
-    });
   }
   if (typeof config.fixarAtePosicao !== 'number' || config.fixarAtePosicao < 0) {
     erros.push('fixarAtePosicao precisa ser um número maior ou igual a 0 (0 = nenhuma fixa)');
