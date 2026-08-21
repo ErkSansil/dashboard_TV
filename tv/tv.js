@@ -194,9 +194,9 @@ function mensagemPodioVazio(config) {
   var requisito = config && config.requisitoPodio;
   if (requisito && requisito.ativo) {
     var info = infoMetrica(requisito.metrica, config);
-    return 'Mínimo de ' + info.formatar(requisito.valorMinimo) + ' em ' + info.rotulo + ' para aparecer no pódio';
+    return 'Ainda vazio — faltam ' + info.formatar(requisito.valorMinimo) + ' em ' + info.rotulo + ' pra alguém entrar aqui';
   }
-  return 'Vaga do pódio ainda sem ninguém';
+  return 'Ainda vazio — essa vaga tá esperando alguém';
 }
 
 function renderizarPodio(podio, metricas, config) {
