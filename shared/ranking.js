@@ -44,6 +44,12 @@ function filtrarNomesExcluidos(pessoas, nomesExcluidos) {
   });
 }
 
+function filtrarPorRequisitoRanking(pessoas, requisitoRanking) {
+  return pessoas.filter(function (pessoa) {
+    return pessoaAtendeRequisito(pessoa, requisitoRanking);
+  });
+}
+
 function sortRanking(pessoas, ordenarPor, direcao) {
   var campo = ordenarPor || 'aproveitamento';
   var direcaoPadrao = campo === 'nome' ? 'asc' : 'desc';
@@ -74,11 +80,34 @@ function montarRanking(pessoas, ordenarPor, direcao) {
   return buildRankingComPosicoes(sortRanking(pessoas, ordenarPor, direcao));
 }
 
-function dividirPodioEResto(ranking, qtdLista) {
+function pessoaAtendeRequisito(pessoa, requisitoPodio) {
+  if (!requisitoPodio || !requisitoPodio.ativo) return true;
+  var valor = pessoa[requisitoPodio.metrica];
+  if (valor === null || valor === undefined) return false;
+  return valor >= requisitoPodio.valorMinimo;
+}
+
+function dividirPodioEResto(ranking, qtdLista, requisitoPodio) {
   var limite = typeof qtdLista === 'number' ? qtdLista : 7;
+  var podio = [];
+  var resto = [];
+  for (var i = 0; i < ranking.length; i++) {
+    var pessoa = ranking[i];
+    if (podio.length < 3 && pessoaAtendeRequisito(pessoa, requisitoPodio)) {
+      podio.push(pessoa);
+    } else {
+      resto.push(pessoa);
+    }
+  }
+  var reordenado = podio.concat(resto).map(function (pessoa, indice) {
+    var copia = {};
+    for (var chave in pessoa) copia[chave] = pessoa[chave];
+    copia.posicao = indice + 1;
+    return copia;
+  });
   return {
-    podio: ranking.slice(0, 3),
-    resto: ranking.slice(3, 3 + limite)
+    podio: reordenado.slice(0, podio.length),
+    resto: reordenado.slice(podio.length, podio.length + limite)
   };
 }
 
@@ -114,9 +143,11 @@ if (typeof module !== 'undefined' && module.exports) {
     normalizeVendaRow: normalizeVendaRow,
     montarPessoasDeValores: montarPessoasDeValores,
     filtrarNomesExcluidos: filtrarNomesExcluidos,
+    filtrarPorRequisitoRanking: filtrarPorRequisitoRanking,
     sortRanking: sortRanking,
     buildRankingComPosicoes: buildRankingComPosicoes,
     montarRanking: montarRanking,
+    pessoaAtendeRequisito: pessoaAtendeRequisito,
     dividirPodioEResto: dividirPodioEResto,
     normalizarChaveNome: normalizarChaveNome,
     montarMapaFotos: montarMapaFotos,

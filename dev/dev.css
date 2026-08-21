@@ -92,12 +92,35 @@ h1, h2 { font-family: var(--fonte-display); }
   background: var(--bg-elevado);
 }
 
-.painel-controles h1 {
-  font-size: 1.4rem;
+.painel-controles__cabecalho {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
   border-bottom: 1px solid var(--borda);
 }
+
+.painel-controles h1 {
+  font-size: 1.4rem;
+  margin: 0;
+}
+
+.botao-padrao {
+  flex-shrink: 0;
+  background: none;
+  border: 1px solid var(--borda);
+  border-radius: 8px;
+  padding: 0.45rem 0.8rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-family: var(--fonte);
+  color: var(--texto-sub);
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+.botao-padrao:hover { border-color: var(--acento); color: var(--acento-escuro); }
 
 .campo { margin-bottom: 1.2rem; display: flex; flex-direction: column; gap: 0.4rem; }
 .campo > label { font-size: 0.85rem; font-weight: 600; color: var(--texto-sub); }
@@ -176,8 +199,102 @@ h1, h2 { font-family: var(--fonte-display); }
   font-family: var(--fonte);
 }
 
-#botaoSalvar {
+.campo-slide.campo-slide--colapsavel {
+  padding: 0;
+  gap: 0;
+  overflow: hidden;
+}
+
+.campo-slide__cabecalho {
   width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.9rem 1rem;
+  background: rgba(236, 72, 153, 0.05);
+  border: none;
+  cursor: pointer;
+  font-family: var(--fonte);
+  text-align: left;
+  transition: background 0.15s ease;
+}
+.campo-slide__cabecalho:hover { background: rgba(236, 72, 153, 0.1); }
+
+.campo-slide__seta {
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  color: var(--texto-sub);
+  transition: transform 0.15s ease;
+}
+.campo-slide--expandido .campo-slide__seta { transform: rotate(90deg); }
+
+.campo-slide__titulo {
+  flex: 1;
+  font-family: var(--fonte-display);
+  font-weight: 700;
+  color: var(--acento-escuro);
+  text-transform: capitalize;
+}
+
+.campo-slide__status {
+  flex-shrink: 0;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(22, 163, 74, 0.14);
+  color: #16a34a;
+}
+.campo-slide__status--inativo {
+  background: rgba(220, 38, 38, 0.12);
+  color: var(--erro);
+}
+
+.campo-slide__corpo {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  border-top: 1px solid var(--borda);
+  transition: opacity 0.15s ease;
+}
+.campo-slide__corpo[hidden] { display: none; }
+
+.campo-slide--inativo .campo-slide__corpo { opacity: 0.45; }
+.campo-slide__corpo input:disabled,
+.campo-slide__corpo select:disabled {
+  cursor: not-allowed;
+  background: var(--bg);
+}
+
+.barra-salvar {
+  position: sticky;
+  bottom: 0;
+  margin: 1.5rem -2rem -2rem;
+  padding: 1rem 2rem;
+  background: var(--bg-elevado);
+  border-top: 1px solid var(--borda);
+  box-shadow: 0 -0.6rem 1.4rem rgba(28, 20, 32, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.barra-salvar__aviso {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--acento-escuro);
+}
+
+.barra-salvar__botoes {
+  display: flex;
+  gap: 0.6rem;
+}
+.barra-salvar__botoes button { flex: 1; }
+
+#botaoSalvar {
   padding: 0.9rem;
   background: linear-gradient(135deg, var(--acento), var(--acento-escuro));
   color: #fff;
@@ -186,10 +303,24 @@ h1, h2 { font-family: var(--fonte-display); }
   cursor: pointer;
   font-weight: 700;
   font-size: 0.95rem;
-  margin-top: 0.5rem;
+  font-family: var(--fonte);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 #botaoSalvar:hover { transform: translateY(-1px); box-shadow: 0 0.7rem 1.4rem rgba(190, 24, 93, 0.25); }
+
+.botao-secundario {
+  padding: 0.9rem;
+  background: var(--bg-elevado);
+  color: var(--texto);
+  border: 1px solid var(--borda);
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.95rem;
+  font-family: var(--fonte);
+  transition: background 0.15s ease;
+}
+.botao-secundario:hover { background: var(--bg); }
 
 .preview {
   padding: 2rem;

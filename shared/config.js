@@ -18,6 +18,9 @@ function configPadrao() {
     rotuloExtra1: '',
     rotuloExtra2: '',
     fixado: null,
+    fixarAtePosicao: 0,
+    requisitoPodio: { ativo: false, metrica: 'aproveitamento', valorMinimo: 60 },
+    requisitoRanking: { ativo: false, metrica: 'aproveitamento', valorMinimo: 0 },
     slides: [
       {
         chave: 'vendas-dia', setor: 'vendas', periodo: 'dia', ativo: true, duracaoSegundos: 20,
@@ -123,6 +126,35 @@ function validarConfig(config) {
         erros.push('metricasVisiveis contém um valor inválido: ' + metrica);
       }
     });
+  }
+  if (typeof config.fixarAtePosicao !== 'number' || config.fixarAtePosicao < 0) {
+    erros.push('fixarAtePosicao precisa ser um número maior ou igual a 0 (0 = nenhuma fixa)');
+  }
+  if (!config.requisitoPodio || typeof config.requisitoPodio !== 'object') {
+    erros.push('requisitoPodio precisa ser um objeto com ativo, metrica e valorMinimo');
+  } else {
+    if (typeof config.requisitoPodio.ativo !== 'boolean') {
+      erros.push('requisitoPodio.ativo precisa ser true ou false');
+    }
+    if (METRICAS_DISPONIVEIS.indexOf(config.requisitoPodio.metrica) === -1) {
+      erros.push('requisitoPodio.metrica precisa ser uma das: ' + METRICAS_DISPONIVEIS.join(', '));
+    }
+    if (typeof config.requisitoPodio.valorMinimo !== 'number') {
+      erros.push('requisitoPodio.valorMinimo precisa ser um número');
+    }
+  }
+  if (!config.requisitoRanking || typeof config.requisitoRanking !== 'object') {
+    erros.push('requisitoRanking precisa ser um objeto com ativo, metrica e valorMinimo');
+  } else {
+    if (typeof config.requisitoRanking.ativo !== 'boolean') {
+      erros.push('requisitoRanking.ativo precisa ser true ou false');
+    }
+    if (METRICAS_DISPONIVEIS.indexOf(config.requisitoRanking.metrica) === -1) {
+      erros.push('requisitoRanking.metrica precisa ser uma das: ' + METRICAS_DISPONIVEIS.join(', '));
+    }
+    if (typeof config.requisitoRanking.valorMinimo !== 'number') {
+      erros.push('requisitoRanking.valorMinimo precisa ser um número');
+    }
   }
   return { valido: erros.length === 0, erros: erros };
 }

@@ -23,7 +23,10 @@
 
   <div id="telaConfig" class="tela-config" hidden>
     <aside class="painel-controles">
-      <h1>Configuração do rodízio</h1>
+      <div class="painel-controles__cabecalho">
+        <h1>Configuração do rodízio</h1>
+        <button type="button" id="botaoPadrao" class="botao-padrao">Voltar ao padrão</button>
+      </div>
       <div class="campo">
         <label>Tema de fundo</label>
         <select id="campoTema">
@@ -77,6 +80,11 @@
         <select id="campoFixado"></select>
       </div>
       <div class="campo">
+        <label>Fixar posições no topo da lista até a posição (0 = nenhuma fixa)</label>
+        <input type="number" id="campoFixarAtePosicao" min="0" step="1" />
+        <p class="mensagem-status">Fixa do 4° colocado até a posição informada, sem rolar com os outros. Ex: 5 fixa 4° e 5°; 7 fixa do 4° ao 7°.</p>
+      </div>
+      <div class="campo">
         <label>Nomes para não aparecer no ranking (um por linha)</label>
         <textarea id="campoNomesExcluidos" rows="4" placeholder="Ex: Miranda&#10;Não enviar Fila"></textarea>
       </div>
@@ -90,9 +98,49 @@
           <label class="campo-metricas__item"><input type="checkbox" id="metricaExtra2" /> <input type="text" id="campoRotuloExtra2" placeholder="Nome da métrica extra 2" class="campo-metricas__rotulo" /></label>
         </div>
       </div>
+      <fieldset class="campo-slide">
+        <legend>Requisito mínimo para o pódio</legend>
+        <label><input type="checkbox" id="campoRequisitoAtivo" /> Exigir um mínimo para entrar no top 3</label>
+        <label>Métrica considerada
+          <select id="campoRequisitoMetrica">
+            <option value="aproveitamento">Aproveitamento (%)</option>
+            <option value="vendasImediato">Vendas Imediato</option>
+            <option value="contratos">Contratos</option>
+            <option value="extra1">Extra 1</option>
+            <option value="extra2">Extra 2</option>
+          </select>
+        </label>
+        <label>Valor mínimo (ex: 60 = 60% se a métrica for Aproveitamento)
+          <input type="number" id="campoRequisitoValor" step="0.01" />
+        </label>
+        <p class="mensagem-status">Quem não atinge o mínimo não aparece no pódio, mas continua na lista, na posição real dele no ranking.</p>
+      </fieldset>
+      <fieldset class="campo-slide">
+        <legend>Requisito mínimo para aparecer no ranking</legend>
+        <label><input type="checkbox" id="campoRequisitoRankingAtivo" /> Exigir um mínimo para aparecer no ranking geral</label>
+        <label>Métrica considerada
+          <select id="campoRequisitoRankingMetrica">
+            <option value="aproveitamento">Aproveitamento (%)</option>
+            <option value="vendasImediato">Vendas Imediato</option>
+            <option value="contratos">Contratos</option>
+            <option value="extra1">Extra 1</option>
+            <option value="extra2">Extra 2</option>
+          </select>
+        </label>
+        <label>Valor mínimo
+          <input type="number" id="campoRequisitoRankingValor" step="0.01" />
+        </label>
+        <p class="mensagem-status">Quem não atinge esse mínimo não aparece em lugar nenhum (nem no pódio, nem na lista). É mais restritivo que o requisito do pódio acima.</p>
+      </fieldset>
       <div id="listaSlides"></div>
-      <button id="botaoSalvar">Salvar configuração</button>
-      <p id="mensagemSalvar" class="mensagem-status"></p>
+      <div class="barra-salvar" id="barraSalvar" hidden>
+        <span class="barra-salvar__aviso">Alterações não salvas</span>
+        <div class="barra-salvar__botoes">
+          <button type="button" id="botaoDescartar" class="botao-secundario">Descartar</button>
+          <button type="button" id="botaoSalvar">Salvar alterações</button>
+        </div>
+        <p id="mensagemSalvar" class="mensagem-status"></p>
+      </div>
     </aside>
     <main class="preview">
       <h2>Preview ao vivo (o que está passando nas TVs)</h2>

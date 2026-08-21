@@ -268,3 +268,82 @@ test('validarConfig aceita fundoBrilho brilhante', () => {
   config.fundoBrilho = 'brilhante';
   assert.equal(validarConfig(config).valido, true);
 });
+
+test('configPadrao vem com fixarAtePosicao 0 (desligada) e requisitoPodio inativo', () => {
+  const config = configPadrao();
+  assert.equal(config.fixarAtePosicao, 0);
+  assert.deepEqual(config.requisitoPodio, { ativo: false, metrica: 'aproveitamento', valorMinimo: 60 });
+});
+
+test('validarConfig rejeita fixarAtePosicao negativa ou que não seja número', () => {
+  const config = configPadrao();
+  config.fixarAtePosicao = -1;
+  assert.equal(validarConfig(config).valido, false);
+  config.fixarAtePosicao = '4';
+  const resultado = validarConfig(config);
+  assert.equal(resultado.valido, false);
+  assert.ok(resultado.erros.some((e) => e.includes('fixarAtePosicao')));
+});
+
+test('validarConfig aceita fixarAtePosicao maior que 0', () => {
+  const config = configPadrao();
+  config.fixarAtePosicao = 5;
+  assert.equal(validarConfig(config).valido, true);
+});
+
+test('configPadrao vem com requisitoRanking inativo e valorMinimo 0', () => {
+  const config = configPadrao();
+  assert.deepEqual(config.requisitoRanking, { ativo: false, metrica: 'aproveitamento', valorMinimo: 0 });
+});
+
+test('validarConfig aceita requisitoRanking ativo com métrica e valor válidos', () => {
+  const config = configPadrao();
+  config.requisitoRanking = { ativo: true, metrica: 'aproveitamento', valorMinimo: 30 };
+  assert.equal(validarConfig(config).valido, true);
+});
+
+test('validarConfig rejeita requisitoRanking ausente', () => {
+  const config = configPadrao();
+  delete config.requisitoRanking;
+  const resultado = validarConfig(config);
+  assert.equal(resultado.valido, false);
+  assert.ok(resultado.erros.some((e) => e.includes('requisitoRanking')));
+});
+
+test('validarConfig rejeita requisitoRanking.metrica desconhecida', () => {
+  const config = configPadrao();
+  config.requisitoRanking = { ativo: true, metrica: 'campo-fantasma', valorMinimo: 30 };
+  const resultado = validarConfig(config);
+  assert.equal(resultado.valido, false);
+  assert.ok(resultado.erros.some((e) => e.includes('requisitoRanking.metrica')));
+});
+
+test('validarConfig aceita requisitoPodio ativo com métrica e valor válidos', () => {
+  const config = configPadrao();
+  config.requisitoPodio = { ativo: true, metrica: 'contratos', valorMinimo: 3 };
+  assert.equal(validarConfig(config).valido, true);
+});
+
+test('validarConfig rejeita requisitoPodio ausente', () => {
+  const config = configPadrao();
+  delete config.requisitoPodio;
+  const resultado = validarConfig(config);
+  assert.equal(resultado.valido, false);
+  assert.ok(resultado.erros.some((e) => e.includes('requisitoPodio')));
+});
+
+test('validarConfig rejeita requisitoPodio.metrica desconhecida', () => {
+  const config = configPadrao();
+  config.requisitoPodio = { ativo: true, metrica: 'campo-fantasma', valorMinimo: 60 };
+  const resultado = validarConfig(config);
+  assert.equal(resultado.valido, false);
+  assert.ok(resultado.erros.some((e) => e.includes('requisitoPodio.metrica')));
+});
+
+test('validarConfig rejeita requisitoPodio.valorMinimo que não seja número', () => {
+  const config = configPadrao();
+  config.requisitoPodio = { ativo: true, metrica: 'aproveitamento', valorMinimo: '60' };
+  const resultado = validarConfig(config);
+  assert.equal(resultado.valido, false);
+  assert.ok(resultado.erros.some((e) => e.includes('requisitoPodio.valorMinimo')));
+});

@@ -403,6 +403,27 @@ body.tema-meianoite::before {
   50% { opacity: 0.95; transform: scale(1.08); }
 }
 
+.podio__item--vazio {
+  justify-content: center;
+  align-items: center;
+  min-height: 18vh;
+  border-style: dashed;
+  box-shadow: none;
+}
+
+.podio__item--vazio.podio__item--pos1::after {
+  display: none;
+}
+
+.podio__vazio-texto {
+  max-width: 11vw;
+  text-align: center;
+  font-size: 0.95vw;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--texto-sub);
+}
+
 .podio__foto {
   width: 9vw;
   height: 9vw;
@@ -471,6 +492,25 @@ body.tema-meianoite::before {
   color: var(--texto);
 }
 
+.lista-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7vh;
+  min-height: 0;
+}
+
+.lista__fixada {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7vh;
+  flex-shrink: 0;
+}
+
+.lista__fixada:empty {
+  display: none;
+}
+
 .lista {
   flex: 1;
   overflow-y: hidden;
@@ -500,6 +540,11 @@ body.tema-meianoite::before {
   border-radius: 0.9vw;
   padding: calc(1.1vh * var(--lista-escala, 1)) 1.3vw;
   box-shadow: inset 0 1px 0 var(--vidro-brilho);
+}
+
+.lista__linha--fixada {
+  border-color: var(--acento);
+  box-shadow: 0 0 1.6vh var(--acento-brilho), inset 0 1px 0 var(--vidro-brilho);
 }
 
 .lista__posicao { font-size: calc(1.15vw * var(--lista-escala, 1)); font-weight: 700; color: var(--texto-sub); }

@@ -5,6 +5,7 @@ const {
   normalizeVendaRow,
   montarPessoasDeValores,
   filtrarNomesExcluidos,
+  filtrarPorRequisitoRanking,
   sortRanking,
   buildRankingComPosicoes,
   montarRanking,
@@ -105,6 +106,51 @@ test('dividirPodioEResto separa top 3 do restante limitado', () => {
   assert.deepEqual(resto.map((p) => p.posicao), [4, 5, 6]);
 });
 
+test('dividirPodioEResto sem requisito ativo mantém o comportamento padrão', () => {
+  const ranking = [
+    { nome: 'A', aproveitamento: 90 },
+    { nome: 'B', aproveitamento: 80 },
+    { nome: 'C', aproveitamento: 70 },
+    { nome: 'D', aproveitamento: 60 }
+  ];
+  const { podio, resto } = dividirPodioEResto(ranking, 5, { ativo: false, metrica: 'aproveitamento', valorMinimo: 999 });
+  assert.deepEqual(podio.map((p) => p.nome), ['A', 'B', 'C']);
+  assert.deepEqual(resto.map((p) => p.nome), ['D']);
+});
+
+test('dividirPodioEResto pula quem não atinge o requisito mínimo, mas mantém na lista', () => {
+  const ranking = [
+    { nome: 'A', aproveitamento: 90 },
+    { nome: 'B', aproveitamento: 50 },
+    { nome: 'C', aproveitamento: 70 },
+    { nome: 'D', aproveitamento: 65 }
+  ];
+  const requisito = { ativo: true, metrica: 'aproveitamento', valorMinimo: 60 };
+  const { podio, resto } = dividirPodioEResto(ranking, 5, requisito);
+  assert.deepEqual(podio.map((p) => p.nome), ['A', 'C', 'D']);
+  assert.deepEqual(resto.map((p) => p.nome), ['B']);
+});
+
+test('dividirPodioEResto renumera a posicao exibida após aplicar o requisito', () => {
+  const ranking = [
+    { nome: 'A', aproveitamento: 90 },
+    { nome: 'B', aproveitamento: 50 },
+    { nome: 'C', aproveitamento: 70 }
+  ];
+  const requisito = { ativo: true, metrica: 'aproveitamento', valorMinimo: 60 };
+  const { podio, resto } = dividirPodioEResto(ranking, 5, requisito);
+  assert.deepEqual(podio.map((p) => p.posicao), [1, 2]);
+  assert.deepEqual(resto.map((p) => p.posicao), [3]);
+});
+
+test('dividirPodioEResto trata pessoa sem a métrica do requisito como não qualificada', () => {
+  const ranking = [{ nome: 'A', aproveitamento: null }, { nome: 'B', aproveitamento: 90 }];
+  const requisito = { ativo: true, metrica: 'aproveitamento', valorMinimo: 60 };
+  const { podio, resto } = dividirPodioEResto(ranking, 5, requisito);
+  assert.deepEqual(podio.map((p) => p.nome), ['B']);
+  assert.deepEqual(resto.map((p) => p.nome), ['A']);
+});
+
 test('montarMapaFotos monta o mapa nome -> URL da foto', () => {
   const linhas = [
     ['Alice', 'vendas', '1AbCdEfGhIjKlMnOpQrSt'],
@@ -143,4 +189,21 @@ test('filtrarNomesExcluidos retorna a lista original quando não há exclusões'
   const pessoas = [{ nome: 'Alice' }, { nome: 'Fernanda' }];
   assert.deepEqual(filtrarNomesExcluidos(pessoas, []), pessoas);
   assert.deepEqual(filtrarNomesExcluidos(pessoas, null), pessoas);
+});
+
+test('filtrarPorRequisitoRanking remove quem não atinge o mínimo, ficando fora do ranking inteiro', () => {
+  const pessoas = [
+    { nome: 'Alice', aproveitamento: 90 },
+    { nome: 'Bruna', aproveitamento: 20 },
+    { nome: 'Carla', aproveitamento: 60 }
+  ];
+  const requisito = { ativo: true, metrica: 'aproveitamento', valorMinimo: 60 };
+  const filtradas = filtrarPorRequisitoRanking(pessoas, requisito);
+  assert.deepEqual(filtradas.map((p) => p.nome), ['Alice', 'Carla']);
+});
+
+test('filtrarPorRequisitoRanking não filtra nada quando inativo', () => {
+  const pessoas = [{ nome: 'Alice', aproveitamento: 5 }];
+  const filtradas = filtrarPorRequisitoRanking(pessoas, { ativo: false, metrica: 'aproveitamento', valorMinimo: 60 });
+  assert.deepEqual(filtradas, pessoas);
 });

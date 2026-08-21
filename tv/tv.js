@@ -141,6 +141,7 @@ function aplicarEstiloFundo(config) {
 function renderizarVazio() {
   pararAutoScroll();
   document.getElementById('podio').innerHTML = '<p class="mensagem-vazia">Nenhum ranking configurado</p>';
+  document.getElementById('listaFixada').innerHTML = '';
   document.getElementById('lista').innerHTML = '';
 }
 
@@ -189,6 +190,15 @@ function metricasParaExibir(config) {
   return metricas && metricas.length > 0 ? metricas : ['aproveitamento'];
 }
 
+function mensagemPodioVazio(config) {
+  var requisito = config && config.requisitoPodio;
+  if (requisito && requisito.ativo) {
+    var info = infoMetrica(requisito.metrica, config);
+    return 'Mínimo de ' + info.formatar(requisito.valorMinimo) + ' em ' + info.rotulo + ' para aparecer no pódio';
+  }
+  return 'Vaga do pódio ainda sem ninguém';
+}
+
 function renderizarPodio(podio, metricas, config) {
   var container = document.getElementById('podio');
   container.innerHTML = '';
@@ -196,8 +206,14 @@ function renderizarPodio(podio, metricas, config) {
   var secundarias = metricas.slice(1);
   [1, 0, 2].forEach(function (indice) {
     var pessoa = podio[indice];
-    if (!pessoa) return;
+    var posicaoSlot = indice + 1;
     var item = document.createElement('div');
+    if (!pessoa) {
+      item.className = 'podio__item podio__item--pos' + posicaoSlot + ' podio__item--vazio';
+      item.innerHTML = '<div class="podio__vazio-texto">' + mensagemPodioVazio(config) + '</div>';
+      container.appendChild(item);
+      return;
+    }
     item.className = 'podio__item podio__item--pos' + pessoa.posicao;
     var chips = secundarias.map(function (chave) {
       var info = infoMetrica(chave, config);
@@ -213,22 +229,43 @@ function renderizarPodio(podio, metricas, config) {
   });
 }
 
+function criarLinhaLista(pessoa, metricas, config, fixada) {
+  var linha = document.createElement('div');
+  linha.className = 'lista__linha' + (fixada ? ' lista__linha--fixada' : '');
+  var htmlMetricas = metricas.map(function (chave) {
+    var info = infoMetrica(chave, config);
+    return '<span class="lista__metrica"><span class="lista__metrica-rotulo">' + info.rotulo + '</span>' + info.formatar(pessoa[chave]) + '</span>';
+  }).join('');
+  linha.innerHTML =
+    '<span class="lista__posicao">' + pessoa.posicao + 'º</span>' +
+    '<span class="lista__foto" style="background-image:url(' + (pessoa.foto || '') + ')"></span>' +
+    '<span class="lista__nome">' + pessoa.nome + '</span>' +
+    '<span class="lista__metricas">' + htmlMetricas + '</span>';
+  return linha;
+}
+
 function renderizarLista(resto, metricas, config, slide) {
+  var containerFixada = document.getElementById('listaFixada');
   var container = document.getElementById('lista');
+  containerFixada.innerHTML = '';
   container.innerHTML = '';
+
+  var itensFixados = [];
+  var itensRolaveis = [];
+  var fixarAtePosicao = config && typeof config.fixarAtePosicao === 'number' ? config.fixarAtePosicao : 0;
   resto.forEach(function (pessoa) {
-    var linha = document.createElement('div');
-    linha.className = 'lista__linha';
-    var htmlMetricas = metricas.map(function (chave) {
-      var info = infoMetrica(chave, config);
-      return '<span class="lista__metrica"><span class="lista__metrica-rotulo">' + info.rotulo + '</span>' + info.formatar(pessoa[chave]) + '</span>';
-    }).join('');
-    linha.innerHTML =
-      '<span class="lista__posicao">' + pessoa.posicao + 'º</span>' +
-      '<span class="lista__foto" style="background-image:url(' + (pessoa.foto || '') + ')"></span>' +
-      '<span class="lista__nome">' + pessoa.nome + '</span>' +
-      '<span class="lista__metricas">' + htmlMetricas + '</span>';
-    container.appendChild(linha);
+    if (fixarAtePosicao > 0 && pessoa.posicao <= fixarAtePosicao) {
+      itensFixados.push(pessoa);
+    } else {
+      itensRolaveis.push(pessoa);
+    }
+  });
+  itensFixados.forEach(function (pessoa) {
+    containerFixada.appendChild(criarLinhaLista(pessoa, metricas, config, true));
+  });
+
+  itensRolaveis.forEach(function (pessoa) {
+    container.appendChild(criarLinhaLista(pessoa, metricas, config, false));
   });
 
   var pxPorSegundo = velocidadeScroll(config);
