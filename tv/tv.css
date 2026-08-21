@@ -590,3 +590,132 @@ body.tema-meianoite::before {
 }
 
 .mensagem-vazia { text-align: center; color: var(--texto-sub); font-size: 1.4vw; }
+
+.metas {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15vw, 1fr));
+  grid-auto-rows: 1fr;
+  gap: 1.4vw;
+  align-content: center;
+  min-height: 0;
+}
+
+.meta__card {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.9vh;
+  padding: 2vh 1vw;
+  border-radius: 1.3vw;
+  background: var(--vidro-bg);
+  border: 1px solid var(--vidro-borda);
+  backdrop-filter: blur(12px) saturate(130%);
+  -webkit-backdrop-filter: blur(12px) saturate(130%);
+  box-shadow: inset 0 1px 0 var(--vidro-brilho);
+}
+
+.meta__card--vazia {
+  border-style: dashed;
+  opacity: 0.45;
+}
+
+.meta__vazia-numero {
+  font-family: var(--fonte-display);
+  font-weight: 800;
+  font-size: 1.6vw;
+  color: var(--texto-sub);
+}
+
+.meta__vazia-texto {
+  text-align: center;
+  font-size: 0.9vw;
+  font-weight: 600;
+  color: var(--texto-sub);
+}
+
+.meta__card--conquistada {
+  border-color: var(--ouro);
+  box-shadow: 0 0 3.2vh rgba(245, 196, 81, 0.45), inset 0 1px 0 var(--vidro-brilho);
+  animation: metaSurgir 0.5s ease;
+}
+
+.meta__card--conquistada::after {
+  content: '';
+  position: absolute;
+  inset: -22%;
+  border-radius: inherit;
+  background: radial-gradient(closest-side, rgba(245, 196, 81, 0.5), transparent 72%);
+  filter: blur(1.1vw);
+  z-index: -1;
+  will-change: transform, opacity;
+  animation: auraGlow 2.6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes metaSurgir {
+  from { transform: scale(0.82); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.meta__posicao-badge {
+  position: absolute;
+  top: 0.8vh;
+  left: 0.7vw;
+  font-family: var(--fonte-display);
+  font-weight: 800;
+  font-size: 0.85vw;
+  color: var(--ouro);
+  background: rgba(0, 0, 0, 0.28);
+  padding: 0.25vh 0.65vw;
+  border-radius: 999px;
+}
+
+.meta__foto {
+  width: 7vw;
+  height: 7vw;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  background-color: var(--borda);
+  border: 2px solid var(--ouro);
+  box-shadow: 0 0 1.6vh rgba(245, 196, 81, 0.4);
+}
+
+.meta__nome {
+  font-family: var(--fonte-display);
+  font-weight: 700;
+  font-size: 1.35vw;
+  text-align: center;
+}
+
+.meta__stats {
+  display: flex;
+  gap: 1vw;
+}
+
+.meta__stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1vh;
+}
+
+.meta__stat-rotulo {
+  font-size: 0.62vw;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--texto-sub);
+  font-weight: 600;
+}
+
+.meta__stat-valor {
+  font-family: var(--fonte-display);
+  font-weight: 800;
+  font-size: 1.3vw;
+  color: var(--ouro);
+  text-shadow: 0 0 1.4vh rgba(245, 196, 81, 0.5);
+}

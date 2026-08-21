@@ -58,11 +58,18 @@ function mostrarSlideAtual(slide) {
     renderizarVazio();
     return;
   }
-  fetch(APPS_SCRIPT_URL + '?action=ranking&setor=' + slide.setor + '&periodo=' + slide.periodo)
+  var ehMetas = slide.setor === 'metas';
+  var url = ehMetas
+    ? APPS_SCRIPT_URL + '?action=metas&periodo=' + slide.periodo
+    : APPS_SCRIPT_URL + '?action=ranking&setor=' + slide.setor + '&periodo=' + slide.periodo;
+  fetch(url)
     .then(function (resposta) { return resposta.json(); })
     .then(function (dados) {
       if (dados.ok) {
-        transicionarPara(function () { renderizar(slide, dados); });
+        transicionarPara(function () {
+          aplicarTemaSlide(slide);
+          if (ehMetas) { renderizarMetas(slide, dados); } else { renderizar(slide, dados); }
+        });
       } else if (slide.modoTroca === 'scroll') {
         agendarAvancoFallback(slide);
       }
@@ -125,6 +132,17 @@ function aplicarTema(tema) {
   }
 }
 
+function aplicarTemaSlide(slide) {
+  var temaGlobal = ESTADO.config && ESTADO.config.tema;
+  aplicarTema((slide && slide.temaProprio) || temaGlobal || 'escuro');
+}
+
+function alternarModoExibicao(modoMetas) {
+  document.getElementById('podio').hidden = modoMetas;
+  document.querySelector('.lista-wrap').hidden = modoMetas;
+  document.getElementById('metas').hidden = !modoMetas;
+}
+
 function aplicarEstiloFundo(config) {
   var raiz = document.documentElement.style;
   var blur = config && typeof config.fundoBlur === 'number' && config.fundoBlur >= 0 ? config.fundoBlur : 10;
@@ -140,12 +158,16 @@ function aplicarEstiloFundo(config) {
 
 function renderizarVazio() {
   pararAutoScroll();
+  aplicarTemaSlide(null);
+  alternarModoExibicao(false);
   document.getElementById('podio').innerHTML = '<p class="mensagem-vazia">Nenhum ranking configurado</p>';
   document.getElementById('listaFixada').innerHTML = '';
   document.getElementById('lista').innerHTML = '';
+  document.getElementById('metas').innerHTML = '';
 }
 
 function renderizar(slide, dados) {
+  alternarModoExibicao(false);
   document.getElementById('rotuloSetor').textContent = slide.setor === 'vendas' ? 'Ranking Vendas' : 'Ranking Qualificação';
   var elPeriodo = document.getElementById('rotuloPeriodo');
   elPeriodo.textContent = nomePeriodo(slide.periodo);
@@ -277,6 +299,61 @@ function renderizarLista(resto, metricas, config, slide) {
     iniciarAutoScroll(container, calcularMeiosCiclos(slide.voltasScroll), avancarSlide, pxPorSegundo);
   } else {
     iniciarAutoScroll(container, null, null, pxPorSegundo);
+  }
+}
+
+function descricaoMeta(meta, config) {
+  if (!meta || !Array.isArray(meta.condicoes)) return 'Meta do dia';
+  var partes = meta.condicoes
+    .filter(function (condicao, indice) { return indice === 0 || condicao.ativo; })
+    .map(function (condicao) {
+      var info = infoMetrica(condicao.metrica, config);
+      return info.formatar(condicao.valorMinimo) + ' ' + info.rotulo;
+    });
+  return partes.join(' + ');
+}
+
+function renderizarMetas(slide, dados) {
+  pararAutoScroll();
+  alternarModoExibicao(true);
+  document.getElementById('rotuloSetor').textContent = 'Metas do Dia';
+  var elPeriodo = document.getElementById('rotuloPeriodo');
+  elPeriodo.textContent = descricaoMeta(slide.meta, ESTADO.config);
+  elPeriodo.className = 'cabecalho__periodo cabecalho__periodo--dia';
+  document.getElementById('rotuloData').textContent = dados.rotulo || '';
+
+  var container = document.getElementById('metas');
+  container.innerHTML = '';
+  var conquistadores = dados.conquistadores || [];
+  var quantidadeMinima = typeof dados.quantidadeCards === 'number' ? dados.quantidadeCards : 6;
+  var totalCards = Math.max(quantidadeMinima, conquistadores.length);
+  var metricasSecundarias = metricasParaExibir(ESTADO.config).filter(function (m) { return m !== 'contratos'; });
+
+  for (var i = 0; i < totalCards; i++) {
+    var pessoa = conquistadores[i];
+    var card = document.createElement('div');
+    if (!pessoa) {
+      card.className = 'meta__card meta__card--vazia';
+      card.innerHTML =
+        '<div class="meta__vazia-numero">' + (i + 1) + 'º</div>' +
+        '<div class="meta__vazia-texto">Aguardando alguém bater a meta</div>';
+      container.appendChild(card);
+      continue;
+    }
+    var chips = metricasSecundarias.map(function (chave) {
+      var info = infoMetrica(chave, ESTADO.config);
+      return '<span class="meta__stat"><span class="meta__stat-rotulo">' + info.rotulo + '</span><span class="meta__stat-valor">' + info.formatar(pessoa[chave]) + '</span></span>';
+    }).join('');
+    card.className = 'meta__card meta__card--conquistada';
+    card.innerHTML =
+      '<span class="meta__posicao-badge">' + pessoa.posicaoConquista + 'º</span>' +
+      '<div class="meta__foto" style="background-image:url(' + (pessoa.foto || '') + ')"></div>' +
+      '<div class="meta__nome">' + pessoa.nome + '</div>' +
+      '<div class="meta__stats">' +
+        '<span class="meta__stat"><span class="meta__stat-rotulo">Contratos</span><span class="meta__stat-valor">' + formatarNumeroOuTraco(pessoa.contratos) + '</span></span>' +
+        chips +
+      '</div>';
+    container.appendChild(card);
   }
 }
 

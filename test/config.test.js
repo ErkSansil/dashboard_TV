@@ -12,8 +12,19 @@ test('configPadrao retorna um config válido', () => {
 
 test('configPadrao tem 4 slides de vendas (dia, semana, mes, ano)', () => {
   const config = configPadrao();
-  const periodos = config.slides.map((s) => s.periodo);
+  const periodos = config.slides.filter((s) => s.setor === 'vendas').map((s) => s.periodo);
   assert.deepEqual(periodos, ['dia', 'semana', 'mes', 'ano']);
+});
+
+test('configPadrao tem 1 slide de metas do dia, inativo por padrão', () => {
+  const config = configPadrao();
+  const metas = config.slides.filter((s) => s.setor === 'metas');
+  assert.equal(metas.length, 1);
+  assert.equal(metas[0].periodo, 'dia');
+  assert.equal(metas[0].ativo, false);
+  assert.equal(metas[0].quantidadeCards, 6);
+  assert.equal(metas[0].meta.ativo, true);
+  assert.deepEqual(metas[0].meta.condicoes[0], { metrica: 'contratos', valorMinimo: 5 });
 });
 
 test('validarConfig rejeita config sem slides', () => {
@@ -269,10 +280,10 @@ test('validarConfig aceita fundoBrilho brilhante', () => {
   assert.equal(validarConfig(config).valido, true);
 });
 
-test('configPadrao vem com fixarAtePosicao 0 (desligada) e requisitoPodio inativo com 3 condicoes em cada slide', () => {
+test('configPadrao vem com fixarAtePosicao 0 (desligada) e requisitoPodio inativo com 3 condicoes em cada slide de vendas', () => {
   const config = configPadrao();
   assert.equal(config.fixarAtePosicao, 0);
-  config.slides.forEach((slide) => {
+  config.slides.filter((s) => s.setor === 'vendas').forEach((slide) => {
     assert.equal(slide.requisitoPodio.ativo, false);
     assert.equal(slide.requisitoPodio.condicoes.length, 3);
     assert.deepEqual(slide.requisitoPodio.condicoes[0], { metrica: 'aproveitamento', valorMinimo: 60 });
@@ -309,9 +320,9 @@ test('validarConfig aceita fixarAtePosicao maior que 0', () => {
   assert.equal(validarConfig(config).valido, true);
 });
 
-test('configPadrao vem com requisitoRanking inativo e condicao 1 com valorMinimo 0 em cada slide', () => {
+test('configPadrao vem com requisitoRanking inativo e condicao 1 com valorMinimo 0 em cada slide de vendas', () => {
   const config = configPadrao();
-  config.slides.forEach((slide) => {
+  config.slides.filter((s) => s.setor === 'vendas').forEach((slide) => {
     assert.equal(slide.requisitoRanking.ativo, false);
     assert.deepEqual(slide.requisitoRanking.condicoes[0], { metrica: 'aproveitamento', valorMinimo: 0 });
   });
@@ -377,4 +388,48 @@ test('validarConfig rejeita condicao com valorMinimo que não seja número', () 
   const resultado = validarConfig(config);
   assert.equal(resultado.valido, false);
   assert.ok(resultado.erros.some((e) => e.includes('slides[0].requisitoPodio.condicoes[0].valorMinimo')));
+});
+
+test('validarConfig rejeita slide de metas sem quantidadeCards válido', () => {
+  const config = configPadrao();
+  const metas = config.slides.find((s) => s.setor === 'metas');
+  metas.quantidadeCards = 0;
+  const resultado = validarConfig(config);
+  assert.equal(resultado.valido, false);
+  assert.ok(resultado.erros.some((e) => e.includes('quantidadeCards')));
+});
+
+test('validarConfig rejeita slide de metas sem meta válida', () => {
+  const config = configPadrao();
+  const metas = config.slides.find((s) => s.setor === 'metas');
+  delete metas.meta;
+  const resultado = validarConfig(config);
+  assert.equal(resultado.valido, false);
+  assert.ok(resultado.erros.some((e) => e.includes('.meta')));
+});
+
+test('validarConfig não exige requisitoPodio/requisitoRanking no slide de metas', () => {
+  const config = configPadrao();
+  const resultado = validarConfig(config);
+  assert.equal(resultado.valido, true);
+});
+
+test('validarConfig aceita temaProprio vazio (usa o global) em qualquer slide', () => {
+  const config = configPadrao();
+  assert.equal(config.slides[0].temaProprio, '');
+  assert.equal(validarConfig(config).valido, true);
+});
+
+test('validarConfig aceita temaProprio com um tema válido', () => {
+  const config = configPadrao();
+  config.slides[0].temaProprio = 'amo';
+  assert.equal(validarConfig(config).valido, true);
+});
+
+test('validarConfig rejeita temaProprio com tema desconhecido', () => {
+  const config = configPadrao();
+  config.slides[0].temaProprio = 'neon';
+  const resultado = validarConfig(config);
+  assert.equal(resultado.valido, false);
+  assert.ok(resultado.erros.some((e) => e.includes('temaProprio')));
 });

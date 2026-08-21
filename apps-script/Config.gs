@@ -13,6 +13,13 @@ function requisitoPadrao(valorMinimoPrimeira) {
   };
 }
 
+function metaPadrao(minimoContratos) {
+  var meta = requisitoPadrao(minimoContratos);
+  meta.ativo = true;
+  meta.condicoes[0].metrica = 'contratos';
+  return meta;
+}
+
 function configPadrao() {
   return {
     tema: 'escuro',
@@ -36,7 +43,7 @@ function configPadrao() {
         modoTroca: 'tempo', voltasScroll: 1,
         linhaInicial: 4,
         colunas: { nome: 'E', aproveitamento: 'F', vendasImediato: 'G', contratos: 'H', extra1: 'I', extra2: 'J' },
-        rotuloCelulas: ['F2'], ordenarPor: 'aproveitamento', direcao: 'desc',
+        rotuloCelulas: ['F2'], ordenarPor: 'aproveitamento', direcao: 'desc', temaProprio: '',
         requisitoPodio: requisitoPadrao(60), requisitoRanking: requisitoPadrao(0)
       },
       {
@@ -44,7 +51,7 @@ function configPadrao() {
         modoTroca: 'tempo', voltasScroll: 1,
         linhaInicial: 4,
         colunas: { nome: 'P', aproveitamento: 'Q', vendasImediato: 'R', contratos: 'S', extra1: 'T', extra2: 'U' },
-        rotuloCelulas: ['Q2', 'R2'], ordenarPor: 'aproveitamento', direcao: 'desc',
+        rotuloCelulas: ['Q2', 'R2'], ordenarPor: 'aproveitamento', direcao: 'desc', temaProprio: '',
         requisitoPodio: requisitoPadrao(60), requisitoRanking: requisitoPadrao(0)
       },
       {
@@ -52,7 +59,7 @@ function configPadrao() {
         modoTroca: 'tempo', voltasScroll: 1,
         linhaInicial: 4,
         colunas: { nome: 'AA', aproveitamento: 'AB', vendasImediato: 'AC', contratos: 'AD', extra1: 'AE', extra2: 'AF' },
-        rotuloCelulas: ['AA2', 'AB2', 'AC2'], ordenarPor: 'aproveitamento', direcao: 'desc',
+        rotuloCelulas: ['AA2', 'AB2', 'AC2'], ordenarPor: 'aproveitamento', direcao: 'desc', temaProprio: '',
         requisitoPodio: requisitoPadrao(60), requisitoRanking: requisitoPadrao(0)
       },
       {
@@ -60,8 +67,16 @@ function configPadrao() {
         modoTroca: 'tempo', voltasScroll: 1,
         linhaInicial: 4,
         colunas: { nome: '', aproveitamento: '', vendasImediato: '', contratos: '', extra1: '', extra2: '' },
-        rotuloCelulas: [], ordenarPor: 'aproveitamento', direcao: 'desc',
+        rotuloCelulas: [], ordenarPor: 'aproveitamento', direcao: 'desc', temaProprio: '',
         requisitoPodio: requisitoPadrao(60), requisitoRanking: requisitoPadrao(0)
+      },
+      {
+        chave: 'metas-dia', setor: 'metas', periodo: 'dia', ativo: false, duracaoSegundos: 20,
+        modoTroca: 'tempo', voltasScroll: 1,
+        linhaInicial: 4,
+        colunas: { nome: 'E', aproveitamento: 'F', vendasImediato: 'G', contratos: 'H', extra1: 'I', extra2: 'J' },
+        rotuloCelulas: ['F2'], ordenarPor: 'aproveitamento', direcao: 'desc', temaProprio: '',
+        quantidadeCards: 6, meta: metaPadrao(5)
       }
     ]
   };
@@ -124,8 +139,18 @@ function validarConfig(config) {
       if (typeof slide.voltasScroll !== 'number' || slide.voltasScroll < 0) {
         erros.push('slide ' + indice + ': voltasScroll precisa ser um número maior ou igual a 0');
       }
-      validarRequisito(slide.requisitoPodio, 'slides[' + indice + '].requisitoPodio', erros);
-      validarRequisito(slide.requisitoRanking, 'slides[' + indice + '].requisitoRanking', erros);
+      if (slide.temaProprio && TEMAS_DISPONIVEIS.indexOf(slide.temaProprio) === -1) {
+        erros.push('slide ' + indice + ': temaProprio precisa ser vazio (usa o global) ou um dos: ' + TEMAS_DISPONIVEIS.join(', '));
+      }
+      if (slide.setor === 'metas') {
+        if (typeof slide.quantidadeCards !== 'number' || slide.quantidadeCards <= 0) {
+          erros.push('slide ' + indice + ': quantidadeCards precisa ser um número maior que 0');
+        }
+        validarRequisito(slide.meta, 'slides[' + indice + '].meta', erros);
+      } else {
+        validarRequisito(slide.requisitoPodio, 'slides[' + indice + '].requisitoPodio', erros);
+        validarRequisito(slide.requisitoRanking, 'slides[' + indice + '].requisitoRanking', erros);
+      }
     });
   }
   if (typeof config.qtdLista !== 'number' || config.qtdLista < 0) {
@@ -177,6 +202,7 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     configPadrao: configPadrao,
     requisitoPadrao: requisitoPadrao,
+    metaPadrao: metaPadrao,
     validarConfig: validarConfig,
     TEMAS_DISPONIVEIS: TEMAS_DISPONIVEIS,
     ESTILOS_FUNDO: ESTILOS_FUNDO

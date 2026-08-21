@@ -102,10 +102,22 @@ function mesclarComPadrao(configCarregado) {
   mesclado.slides = (mesclado.slides || []).map(function (slide) {
     var copia = {};
     for (var campo in slide) copia[campo] = slide[campo];
-    copia.requisitoPodio = normalizarRequisito(slide.requisitoPodio || requisitoPodioGlobalAntigo, requisitoPadrao(60));
-    copia.requisitoRanking = normalizarRequisito(slide.requisitoRanking || requisitoRankingGlobalAntigo, requisitoPadrao(0));
+    copia.temaProprio = typeof slide.temaProprio === 'string' ? slide.temaProprio : '';
+    if (slide.setor === 'metas') {
+      copia.meta = normalizarRequisito(slide.meta, metaPadrao(5));
+      copia.quantidadeCards = typeof slide.quantidadeCards === 'number' && slide.quantidadeCards > 0 ? slide.quantidadeCards : 6;
+    } else {
+      copia.requisitoPodio = normalizarRequisito(slide.requisitoPodio || requisitoPodioGlobalAntigo, requisitoPadrao(60));
+      copia.requisitoRanking = normalizarRequisito(slide.requisitoRanking || requisitoRankingGlobalAntigo, requisitoPadrao(0));
+    }
     return copia;
   });
+  // garante que a aba "Metas do Dia" sempre existe, mesmo em config salvo antes dela existir
+  var temMetasDia = mesclado.slides.some(function (s) { return s.setor === 'metas' && s.periodo === 'dia'; });
+  if (!temMetasDia) {
+    var slidesPadrao = configPadrao().slides;
+    mesclado.slides.push(slidesPadrao[slidesPadrao.length - 1]);
+  }
   return mesclado;
 }
 
@@ -127,6 +139,26 @@ var METRICAS_CAMPO = [
   { chave: 'extra1', id: 'metricaExtra1' },
   { chave: 'extra2', id: 'metricaExtra2' }
 ];
+
+var TEMAS_OPCOES = [
+  { valor: 'escuro', rotulo: 'Escuro (neutro, sem animação)' },
+  { valor: 'claro', rotulo: 'Claro' },
+  { valor: 'amo', rotulo: 'AMO (rosa e azul)' },
+  { valor: 'aurora', rotulo: 'Aurora (verde e turquesa)' },
+  { valor: 'sunset', rotulo: 'Pôr do Sol (laranja e rosa)' },
+  { valor: 'oceano', rotulo: 'Oceano (azul e ciano)' },
+  { valor: 'platina', rotulo: 'Platina (prata, premium)' },
+  { valor: 'fogo', rotulo: 'Fogo (vermelho e laranja)' },
+  { valor: 'meianoite', rotulo: 'Meia-noite (azul escuro, sutil)' }
+];
+
+function opcoesTemaSlide(selecionado) {
+  var opcoes = '<option value=""' + (!selecionado ? ' selected' : '') + '>Usar o tema global</option>';
+  opcoes += TEMAS_OPCOES.map(function (t) {
+    return '<option value="' + t.valor + '"' + (t.valor === selecionado ? ' selected' : '') + '>' + t.rotulo + '</option>';
+  }).join('');
+  return opcoes;
+}
 
 var METRICAS_REQUISITO = [
   { valor: 'aproveitamento', rotulo: 'Aproveitamento (%)' },
@@ -259,26 +291,38 @@ function preencherFormulario(config) {
   config.slides.forEach(function (slide, indice) {
     var expandido = slideEstaExpandido(indice);
     var desabilitado = slide.ativo ? '' : 'disabled';
+    var ehMetas = slide.setor === 'metas';
     var bloco = document.createElement('div');
     bloco.className = 'campo-slide campo-slide--colapsavel' +
       (slide.ativo ? '' : ' campo-slide--inativo') +
       (expandido ? ' campo-slide--expandido' : '');
-    bloco.innerHTML =
-      '<button type="button" class="campo-slide__cabecalho" data-toggle-indice="' + indice + '">' +
-        '<span class="campo-slide__seta">▸</span>' +
-        '<span class="campo-slide__titulo">' + slide.setor + ' — ' + slide.periodo + '</span>' +
-        '<span class="campo-slide__status' + (slide.ativo ? '' : ' campo-slide__status--inativo') + '">' + (slide.ativo ? 'Ativo' : 'Inativo') + '</span>' +
-      '</button>' +
-      '<div class="campo-slide__corpo"' + (expandido ? '' : ' hidden') + '>' +
-        '<label><input type="checkbox" data-indice="' + indice + '" data-campo="ativo" ' + (slide.ativo ? 'checked' : '') + ' /> Ativo</label>' +
-        '<label>Duração (segundos) <input type="number" min="1" ' + desabilitado + ' data-indice="' + indice + '" data-campo="duracaoSegundos" value="' + slide.duracaoSegundos + '" /></label>' +
-        '<label>Linha inicial <input type="number" min="1" ' + desabilitado + ' data-indice="' + indice + '" data-campo="linhaInicial" value="' + slide.linhaInicial + '" /></label>' +
-        '<label>Coluna Nome <input type="text" ' + desabilitado + ' data-indice="' + indice + '" data-campo="colunas.nome" value="' + slide.colunas.nome + '" /></label>' +
-        '<label>Coluna Aproveitamento <input type="text" ' + desabilitado + ' data-indice="' + indice + '" data-campo="colunas.aproveitamento" value="' + slide.colunas.aproveitamento + '" /></label>' +
-        '<label>Coluna Vendas Imediato <input type="text" ' + desabilitado + ' data-indice="' + indice + '" data-campo="colunas.vendasImediato" value="' + slide.colunas.vendasImediato + '" /></label>' +
-        '<label>Coluna Contratos <input type="text" ' + desabilitado + ' data-indice="' + indice + '" data-campo="colunas.contratos" value="' + slide.colunas.contratos + '" /></label>' +
-        '<label>Coluna Extra 1 <input type="text" ' + desabilitado + ' data-indice="' + indice + '" data-campo="colunas.extra1" value="' + (slide.colunas.extra1 || '') + '" /></label>' +
-        '<label>Coluna Extra 2 <input type="text" ' + desabilitado + ' data-indice="' + indice + '" data-campo="colunas.extra2" value="' + (slide.colunas.extra2 || '') + '" /></label>' +
+    var titulo = ehMetas ? 'Metas do Dia' : (slide.setor + ' — ' + slide.periodo);
+
+    var camposComuns =
+      '<label><input type="checkbox" data-indice="' + indice + '" data-campo="ativo" ' + (slide.ativo ? 'checked' : '') + ' /> Ativo</label>' +
+      '<label>Duração (segundos) <input type="number" min="1" ' + desabilitado + ' data-indice="' + indice + '" data-campo="duracaoSegundos" value="' + slide.duracaoSegundos + '" /></label>' +
+      '<label>Tema desta tela' +
+        '<select ' + desabilitado + ' data-indice="' + indice + '" data-campo="temaProprio">' + opcoesTemaSlide(slide.temaProprio) + '</select>' +
+      '</label>' +
+      '<label>Linha inicial <input type="number" min="1" ' + desabilitado + ' data-indice="' + indice + '" data-campo="linhaInicial" value="' + slide.linhaInicial + '" /></label>' +
+      '<label>Coluna Nome <input type="text" ' + desabilitado + ' data-indice="' + indice + '" data-campo="colunas.nome" value="' + slide.colunas.nome + '" /></label>' +
+      '<label>Coluna Aproveitamento <input type="text" ' + desabilitado + ' data-indice="' + indice + '" data-campo="colunas.aproveitamento" value="' + slide.colunas.aproveitamento + '" /></label>' +
+      '<label>Coluna Vendas Imediato <input type="text" ' + desabilitado + ' data-indice="' + indice + '" data-campo="colunas.vendasImediato" value="' + slide.colunas.vendasImediato + '" /></label>' +
+      '<label>Coluna Contratos <input type="text" ' + desabilitado + ' data-indice="' + indice + '" data-campo="colunas.contratos" value="' + slide.colunas.contratos + '" /></label>' +
+      '<label>Coluna Extra 1 <input type="text" ' + desabilitado + ' data-indice="' + indice + '" data-campo="colunas.extra1" value="' + (slide.colunas.extra1 || '') + '" /></label>' +
+      '<label>Coluna Extra 2 <input type="text" ' + desabilitado + ' data-indice="' + indice + '" data-campo="colunas.extra2" value="' + (slide.colunas.extra2 || '') + '" /></label>';
+
+    var camposEspecificos;
+    if (ehMetas) {
+      camposEspecificos =
+        '<label>Quantidade de cards (vagas exibidas no mínimo) <input type="number" min="1" ' + desabilitado + ' data-indice="' + indice + '" data-campo="quantidadeCards" value="' + slide.quantidadeCards + '" /></label>' +
+        htmlBlocoRequisito(
+          'campoMeta' + indice, 'Meta do dia',
+          'Meta ativa', slide.meta,
+          'Quem atinge todas as condições ativas ganha um card, na ordem em que bateu a meta pela primeira vez hoje. Se aparecerem mais pessoas do que cards, a tela cresce pra caber todo mundo.'
+        );
+    } else {
+      camposEspecificos =
         '<label>Ordenar por' +
           '<select ' + desabilitado + ' data-indice="' + indice + '" data-campo="ordenarPor">' +
             '<option value="aproveitamento"' + (slide.ordenarPor === 'aproveitamento' ? ' selected' : '') + '>Aproveitamento (%)</option>' +
@@ -311,8 +355,16 @@ function preencherFormulario(config) {
           'campoRequisitoRanking' + indice, 'Requisito mínimo para aparecer no ranking',
           'Exigir um mínimo para aparecer no ranking geral', slide.requisitoRanking,
           'Quem não atinge todas as condições ativas não aparece em lugar nenhum (nem no pódio, nem na lista). É mais restritivo que o requisito do pódio acima.'
-        ) +
-      '</div>';
+        );
+    }
+
+    bloco.innerHTML =
+      '<button type="button" class="campo-slide__cabecalho" data-toggle-indice="' + indice + '">' +
+        '<span class="campo-slide__seta">▸</span>' +
+        '<span class="campo-slide__titulo">' + titulo + '</span>' +
+        '<span class="campo-slide__status' + (slide.ativo ? '' : ' campo-slide__status--inativo') + '">' + (slide.ativo ? 'Ativo' : 'Inativo') + '</span>' +
+      '</button>' +
+      '<div class="campo-slide__corpo"' + (expandido ? '' : ' hidden') + '>' + camposComuns + camposEspecificos + '</div>';
     container.appendChild(bloco);
     sincronizarCamposRequisito(bloco, slide.ativo);
   });
@@ -365,8 +417,12 @@ function lerFormularioParaConfig() {
   });
 
   config.slides.forEach(function (slide, indice) {
-    slide.requisitoPodio = lerRequisito('campoRequisitoPodio' + indice);
-    slide.requisitoRanking = lerRequisito('campoRequisitoRanking' + indice);
+    if (slide.setor === 'metas') {
+      slide.meta = lerRequisito('campoMeta' + indice);
+    } else {
+      slide.requisitoPodio = lerRequisito('campoRequisitoPodio' + indice);
+      slide.requisitoRanking = lerRequisito('campoRequisitoRanking' + indice);
+    }
   });
 
   return config;

@@ -12,7 +12,10 @@ const {
   dividirPodioEResto,
   normalizarChaveNome,
   montarMapaFotos,
-  anexarFotos
+  anexarFotos,
+  filtrarPorMeta,
+  atualizarOrdemConquistas,
+  montarConquistadores
 } = require('../shared/ranking.js');
 
 test('normalizeVendaRow converte e limpa os campos de uma linha', () => {
@@ -273,4 +276,62 @@ test('filtrarPorRequisitoRanking exige as duas condicoes ativas ao mesmo tempo',
   };
   const filtradas = filtrarPorRequisitoRanking(pessoas, requisito);
   assert.deepEqual(filtradas.map((p) => p.nome), ['Bruna']);
+});
+
+test('filtrarPorMeta pega quem tem contratos suficientes, aproveitamento livre quando a condicao extra ta desligada', () => {
+  const pessoas = [
+    { nome: 'Alice', contratos: 5, aproveitamento: 10 },
+    { nome: 'Bruna', contratos: 4, aproveitamento: 99 }
+  ];
+  const meta = { ativo: true, condicoes: [condicaoUnica('contratos', 5), { ativo: false, metrica: 'aproveitamento', valorMinimo: 80 }, { ativo: false, metrica: 'aproveitamento', valorMinimo: 0 }] };
+  const filtradas = filtrarPorMeta(pessoas, meta);
+  assert.deepEqual(filtradas.map((p) => p.nome), ['Alice']);
+});
+
+test('filtrarPorMeta exige tambem o aproveitamento quando a condicao extra ta ligada', () => {
+  const pessoas = [
+    { nome: 'Alice', contratos: 5, aproveitamento: 10 },
+    { nome: 'Bruna', contratos: 5, aproveitamento: 90 }
+  ];
+  const meta = { ativo: true, condicoes: [condicaoUnica('contratos', 5), { ativo: true, metrica: 'aproveitamento', valorMinimo: 80 }, { ativo: false, metrica: 'aproveitamento', valorMinimo: 0 }] };
+  const filtradas = filtrarPorMeta(pessoas, meta);
+  assert.deepEqual(filtradas.map((p) => p.nome), ['Bruna']);
+});
+
+test('atualizarOrdemConquistas mantem quem ja bateu na mesma posicao e so acrescenta os novos no fim', () => {
+  const ordemAnterior = ['alice', 'bruna'];
+  const nomesQueBateram = ['bruna', 'alice', 'carla'];
+  const ordem = atualizarOrdemConquistas(ordemAnterior, nomesQueBateram);
+  assert.deepEqual(ordem, ['alice', 'bruna', 'carla']);
+});
+
+test('atualizarOrdemConquistas remove quem nao bate mais a meta', () => {
+  const ordemAnterior = ['alice', 'bruna'];
+  const nomesQueBateram = ['bruna'];
+  const ordem = atualizarOrdemConquistas(ordemAnterior, nomesQueBateram);
+  assert.deepEqual(ordem, ['bruna']);
+});
+
+test('atualizarOrdemConquistas comeca vazia quando ninguem bateu ainda', () => {
+  const ordem = atualizarOrdemConquistas([], []);
+  assert.deepEqual(ordem, []);
+});
+
+test('montarConquistadores numera pela ordem de chegada, nao pelo valor', () => {
+  const ordem = ['carla', 'alice'];
+  const mapaPessoas = {
+    alice: { nome: 'Alice', contratos: 9 },
+    carla: { nome: 'Carla', contratos: 5 }
+  };
+  const mapaFotos = { alice: 'https://exemplo.com/alice.jpg' };
+  const conquistadores = montarConquistadores(ordem, mapaPessoas, mapaFotos);
+  assert.deepEqual(conquistadores.map((c) => c.nome), ['Carla', 'Alice']);
+  assert.deepEqual(conquistadores.map((c) => c.posicaoConquista), [1, 2]);
+  assert.equal(conquistadores[1].foto, 'https://exemplo.com/alice.jpg');
+  assert.equal(conquistadores[0].foto, '');
+});
+
+test('montarConquistadores ignora nomes na ordem que nao tem mais dados (ex: erro pontual)', () => {
+  const conquistadores = montarConquistadores(['fantasma'], {}, {});
+  assert.deepEqual(conquistadores, []);
 });

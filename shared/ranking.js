@@ -125,6 +125,34 @@ function normalizarChaveNome(nome) {
   return String(nome).trim().toLowerCase();
 }
 
+function filtrarPorMeta(pessoas, meta) {
+  return pessoas.filter(function (pessoa) {
+    return pessoaAtendeRequisito(pessoa, meta);
+  });
+}
+
+function atualizarOrdemConquistas(ordemAnterior, nomesQueBateram) {
+  var ordem = (ordemAnterior || []).slice();
+  nomesQueBateram.forEach(function (nomeChave) {
+    if (ordem.indexOf(nomeChave) === -1) ordem.push(nomeChave);
+  });
+  return ordem.filter(function (nomeChave) { return nomesQueBateram.indexOf(nomeChave) !== -1; });
+}
+
+function montarConquistadores(ordem, mapaPessoas, mapaFotos) {
+  var resultado = [];
+  ordem.forEach(function (nomeChave, indice) {
+    var pessoa = mapaPessoas[nomeChave];
+    if (!pessoa) return;
+    var copia = {};
+    for (var chave in pessoa) copia[chave] = pessoa[chave];
+    copia.foto = (mapaFotos && mapaFotos[nomeChave]) || '';
+    copia.posicaoConquista = indice + 1;
+    resultado.push(copia);
+  });
+  return resultado;
+}
+
 function montarMapaFotos(linhasEquipe) {
   var mapa = {};
   for (var i = 0; i < linhasEquipe.length; i++) {
@@ -161,6 +189,9 @@ if (typeof module !== 'undefined' && module.exports) {
     pessoaAtendeRequisito: pessoaAtendeRequisito,
     dividirPodioEResto: dividirPodioEResto,
     normalizarChaveNome: normalizarChaveNome,
+    filtrarPorMeta: filtrarPorMeta,
+    atualizarOrdemConquistas: atualizarOrdemConquistas,
+    montarConquistadores: montarConquistadores,
     montarMapaFotos: montarMapaFotos,
     anexarFotos: anexarFotos
   };

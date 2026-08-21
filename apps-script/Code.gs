@@ -5,13 +5,15 @@ var ABA_EQUIPE = 'EQUIPE';
 var ABA_CONFIG = 'CONFIG';
 var ABA_CREDENCIAIS = 'CREDENCIAIS DEV';
 var CELULA_CONFIG_JSON = 'B2';
-var VERSAO_BACKEND = '2026-08-21-2';
+var VERSAO_BACKEND = '2026-08-21-3';
 
 function doGet(e) {
   var acao = e.parameter.action;
   var resposta;
   if (acao === 'ranking') {
     resposta = acaoRanking(e.parameter.setor, e.parameter.periodo);
+  } else if (acao === 'metas') {
+    resposta = acaoMetas(e.parameter.periodo);
   } else if (acao === 'config') {
     resposta = acaoConfig();
   } else if (acao === 'salvarconfig') {
@@ -106,6 +108,52 @@ function acaoRanking(setor, periodo) {
     atualizadoEm: new Date().toISOString(),
     podio: dividido.podio,
     resto: dividido.resto
+  };
+}
+
+function acaoMetas(periodo) {
+  var config = lerConfigAtual();
+  var slide = encontrarSlide(config, 'metas', periodo);
+  if (!slide) {
+    return { ok: false, erro: 'Nenhuma meta configurada para ' + periodo };
+  }
+  var planilha = getPlanilha();
+  var abaVendas = planilha.getSheetByName(ABA_VENDAS);
+  var pessoas = lerRankingVendas(abaVendas, slide);
+  pessoas = filtrarNomesExcluidos(pessoas, config.nomesExcluidos);
+
+  var abaEquipe = planilha.getSheetByName(ABA_EQUIPE);
+  var mapaFotos = montarMapaFotos(abaEquipe.getDataRange().getValues().slice(1));
+
+  var quemBateu = filtrarPorMeta(pessoas, slide.meta);
+  var mapaPessoas = {};
+  var nomesQueBateram = quemBateu.map(function (pessoa) {
+    var chaveNome = normalizarChaveNome(pessoa.nome);
+    mapaPessoas[chaveNome] = pessoa;
+    return chaveNome;
+  });
+
+  var hoje = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd');
+  var chavePropriedade = 'ordemMetas_' + periodo + '_' + hoje;
+  var propriedades = PropertiesService.getScriptProperties();
+  var ordemAnterior = [];
+  try {
+    ordemAnterior = JSON.parse(propriedades.getProperty(chavePropriedade) || '[]');
+  } catch (erro) {
+    ordemAnterior = [];
+  }
+  var ordemAtualizada = atualizarOrdemConquistas(ordemAnterior, nomesQueBateram);
+  propriedades.setProperty(chavePropriedade, JSON.stringify(ordemAtualizada));
+
+  var conquistadores = montarConquistadores(ordemAtualizada, mapaPessoas, mapaFotos);
+
+  return {
+    ok: true,
+    periodo: periodo,
+    rotulo: lerRotulo(abaVendas, slide.rotuloCelulas),
+    atualizadoEm: new Date().toISOString(),
+    quantidadeCards: slide.quantidadeCards,
+    conquistadores: conquistadores
   };
 }
 
