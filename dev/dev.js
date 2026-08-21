@@ -21,6 +21,7 @@ function atualizarEstadoAtivoSlide(checkboxAtivo) {
     if (campo.getAttribute('data-campo') === 'ativo') return;
     campo.disabled = !ativo;
   });
+  sincronizarCamposRequisito(bloco, ativo);
 }
 
 document.getElementById('listaSlides').addEventListener('click', function (evento) {
@@ -89,11 +90,21 @@ function normalizarRequisito(recebido, padrao) {
 function mesclarComPadrao(configCarregado) {
   var mesclado = configPadrao();
   if (!configCarregado) return mesclado;
+  // requisitoPodio/requisitoRanking já existiram no nível raiz do config (versão anterior, um requisito global
+  // pra todos os períodos) - se um slide ainda não tiver o dele próprio, usa esse como ponto de partida
+  var requisitoPodioGlobalAntigo = configCarregado.requisitoPodio;
+  var requisitoRankingGlobalAntigo = configCarregado.requisitoRanking;
   for (var chave in configCarregado) {
     mesclado[chave] = configCarregado[chave];
   }
-  ['requisitoPodio', 'requisitoRanking'].forEach(function (chaveRequisito) {
-    mesclado[chaveRequisito] = normalizarRequisito(configCarregado[chaveRequisito], configPadrao()[chaveRequisito]);
+  delete mesclado.requisitoPodio;
+  delete mesclado.requisitoRanking;
+  mesclado.slides = (mesclado.slides || []).map(function (slide) {
+    var copia = {};
+    for (var campo in slide) copia[campo] = slide[campo];
+    copia.requisitoPodio = normalizarRequisito(slide.requisitoPodio || requisitoPodioGlobalAntigo, requisitoPadrao(60));
+    copia.requisitoRanking = normalizarRequisito(slide.requisitoRanking || requisitoRankingGlobalAntigo, requisitoPadrao(0));
+    return copia;
   });
   return mesclado;
 }
@@ -159,10 +170,9 @@ function atualizarEstadoCondicao(checkboxAtivo) {
   });
 }
 
-function renderizarBlocoRequisito(containerId, prefixo, titulo, rotuloAtivo, requisito, textoExplicativo) {
-  var container = document.getElementById(containerId);
+function htmlBlocoRequisito(prefixo, titulo, rotuloAtivo, requisito, textoExplicativo) {
   var condicoes = requisito.condicoes;
-  container.innerHTML =
+  return (
     '<fieldset class="campo-slide campo-requisito">' +
       '<legend>' + titulo + '</legend>' +
       '<label><input type="checkbox" id="' + prefixo + 'Ativo" ' + (requisito.ativo ? 'checked' : '') + ' /> ' + rotuloAtivo + '</label>' +
@@ -170,7 +180,25 @@ function renderizarBlocoRequisito(containerId, prefixo, titulo, rotuloAtivo, req
       renderizarCondicao(prefixo, 1, condicoes[1], true, 'Condição 2 (opcional)') +
       renderizarCondicao(prefixo, 2, condicoes[2], true, 'Condição 3 (opcional)') +
       '<p class="mensagem-status">' + textoExplicativo + '</p>' +
-    '</fieldset>';
+    '</fieldset>'
+  );
+}
+
+function sincronizarCamposRequisito(blocoSlide, slideAtivo) {
+  blocoSlide.querySelectorAll('.campo-requisito').forEach(function (fieldset) {
+    var ativoRequisito = fieldset.querySelector(':scope > label > input[type="checkbox"]');
+    if (ativoRequisito) ativoRequisito.disabled = !slideAtivo;
+    fieldset.querySelectorAll('.campo-requisito__condicao').forEach(function (condicaoEl) {
+      var toggle = condicaoEl.querySelector('.campo-requisito__toggle input[type="checkbox"]');
+      var condicaoAtiva = toggle ? toggle.checked : true;
+      var habilitado = slideAtivo && condicaoAtiva;
+      condicaoEl.classList.toggle('campo-requisito__condicao--inativa', !habilitado);
+      condicaoEl.querySelectorAll('select, input[type="number"]').forEach(function (campo) {
+        campo.disabled = !habilitado;
+      });
+      if (toggle) toggle.disabled = !slideAtivo;
+    });
+  });
 }
 
 function lerCondicao(prefixo, indice, comToggle) {
@@ -226,17 +254,6 @@ function preencherFormulario(config) {
 
   document.getElementById('campoFixarAtePosicao').value = typeof config.fixarAtePosicao === 'number' ? config.fixarAtePosicao : 0;
 
-  renderizarBlocoRequisito(
-    'blocoRequisitoPodio', 'campoRequisitoPodio', 'Requisito mínimo para o pódio',
-    'Exigir um mínimo para entrar no top 3', config.requisitoPodio,
-    'Quem não atinge todas as condições ativas não aparece no pódio, mas continua na lista, na posição real dele no ranking.'
-  );
-  renderizarBlocoRequisito(
-    'blocoRequisitoRanking', 'campoRequisitoRanking', 'Requisito mínimo para aparecer no ranking',
-    'Exigir um mínimo para aparecer no ranking geral', config.requisitoRanking,
-    'Quem não atinge todas as condições ativas não aparece em lugar nenhum (nem no pódio, nem na lista). É mais restritivo que o requisito do pódio acima.'
-  );
-
   var container = document.getElementById('listaSlides');
   container.innerHTML = '';
   config.slides.forEach(function (slide, indice) {
@@ -285,8 +302,19 @@ function preencherFormulario(config) {
         '<label>Rolagens antes de trocar — só se "Depois da rolagem" (0 = passar 1x sem voltar, 1 = ida e volta 1x, 2 = ida e volta 2x...) ' +
           '<input type="number" min="0" ' + desabilitado + ' data-indice="' + indice + '" data-campo="voltasScroll" value="' + slide.voltasScroll + '" />' +
         '</label>' +
+        htmlBlocoRequisito(
+          'campoRequisitoPodio' + indice, 'Requisito mínimo para o pódio',
+          'Exigir um mínimo para entrar no top 3', slide.requisitoPodio,
+          'Quem não atinge todas as condições ativas não aparece no pódio, mas continua na lista, na posição real dele no ranking.'
+        ) +
+        htmlBlocoRequisito(
+          'campoRequisitoRanking' + indice, 'Requisito mínimo para aparecer no ranking',
+          'Exigir um mínimo para aparecer no ranking geral', slide.requisitoRanking,
+          'Quem não atinge todas as condições ativas não aparece em lugar nenhum (nem no pódio, nem na lista). É mais restritivo que o requisito do pódio acima.'
+        ) +
       '</div>';
     container.appendChild(bloco);
+    sincronizarCamposRequisito(bloco, slide.ativo);
   });
 }
 
@@ -310,8 +338,6 @@ function lerFormularioParaConfig() {
   config.fixado = fixadoValor ? { setor: fixadoValor.split('|')[0], periodo: fixadoValor.split('|')[1] } : null;
 
   config.fixarAtePosicao = Number(document.getElementById('campoFixarAtePosicao').value);
-  config.requisitoPodio = lerRequisito('campoRequisitoPodio');
-  config.requisitoRanking = lerRequisito('campoRequisitoRanking');
 
   config.metricasVisiveis = METRICAS_CAMPO
     .filter(function (item) { return document.getElementById(item.id).checked; })
@@ -336,6 +362,11 @@ function lerFormularioParaConfig() {
     } else {
       slide[nomeCampo] = valor;
     }
+  });
+
+  config.slides.forEach(function (slide, indice) {
+    slide.requisitoPodio = lerRequisito('campoRequisitoPodio' + indice);
+    slide.requisitoRanking = lerRequisito('campoRequisitoRanking' + indice);
   });
 
   return config;

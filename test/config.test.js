@@ -269,14 +269,28 @@ test('validarConfig aceita fundoBrilho brilhante', () => {
   assert.equal(validarConfig(config).valido, true);
 });
 
-test('configPadrao vem com fixarAtePosicao 0 (desligada) e requisitoPodio inativo com 3 condicoes', () => {
+test('configPadrao vem com fixarAtePosicao 0 (desligada) e requisitoPodio inativo com 3 condicoes em cada slide', () => {
   const config = configPadrao();
   assert.equal(config.fixarAtePosicao, 0);
-  assert.equal(config.requisitoPodio.ativo, false);
-  assert.equal(config.requisitoPodio.condicoes.length, 3);
-  assert.deepEqual(config.requisitoPodio.condicoes[0], { metrica: 'aproveitamento', valorMinimo: 60 });
-  assert.equal(config.requisitoPodio.condicoes[1].ativo, false);
-  assert.equal(config.requisitoPodio.condicoes[2].ativo, false);
+  config.slides.forEach((slide) => {
+    assert.equal(slide.requisitoPodio.ativo, false);
+    assert.equal(slide.requisitoPodio.condicoes.length, 3);
+    assert.deepEqual(slide.requisitoPodio.condicoes[0], { metrica: 'aproveitamento', valorMinimo: 60 });
+    assert.equal(slide.requisitoPodio.condicoes[1].ativo, false);
+    assert.equal(slide.requisitoPodio.condicoes[2].ativo, false);
+  });
+});
+
+test('configPadrao permite requisitos diferentes por período (dia vs semana)', () => {
+  const config = configPadrao();
+  const dia = config.slides.find((s) => s.periodo === 'dia');
+  const semana = config.slides.find((s) => s.periodo === 'semana');
+  dia.requisitoPodio.ativo = true;
+  dia.requisitoPodio.condicoes[0] = { metrica: 'vendasImediato', valorMinimo: 2 };
+  semana.requisitoPodio.ativo = true;
+  semana.requisitoPodio.condicoes[0] = { metrica: 'vendasImediato', valorMinimo: 20 };
+  assert.equal(validarConfig(config).valido, true);
+  assert.notDeepEqual(dia.requisitoPodio, semana.requisitoPodio);
 });
 
 test('validarConfig rejeita fixarAtePosicao negativa ou que não seja número', () => {
@@ -295,70 +309,72 @@ test('validarConfig aceita fixarAtePosicao maior que 0', () => {
   assert.equal(validarConfig(config).valido, true);
 });
 
-test('configPadrao vem com requisitoRanking inativo e condicao 1 com valorMinimo 0', () => {
+test('configPadrao vem com requisitoRanking inativo e condicao 1 com valorMinimo 0 em cada slide', () => {
   const config = configPadrao();
-  assert.equal(config.requisitoRanking.ativo, false);
-  assert.deepEqual(config.requisitoRanking.condicoes[0], { metrica: 'aproveitamento', valorMinimo: 0 });
+  config.slides.forEach((slide) => {
+    assert.equal(slide.requisitoRanking.ativo, false);
+    assert.deepEqual(slide.requisitoRanking.condicoes[0], { metrica: 'aproveitamento', valorMinimo: 0 });
+  });
 });
 
 test('validarConfig aceita requisitoRanking ativo com as 3 condicoes válidas', () => {
   const config = configPadrao();
-  config.requisitoRanking.ativo = true;
-  config.requisitoRanking.condicoes[0] = { metrica: 'aproveitamento', valorMinimo: 30 };
+  config.slides[0].requisitoRanking.ativo = true;
+  config.slides[0].requisitoRanking.condicoes[0] = { metrica: 'aproveitamento', valorMinimo: 30 };
   assert.equal(validarConfig(config).valido, true);
 });
 
-test('validarConfig rejeita requisitoRanking ausente', () => {
+test('validarConfig rejeita requisitoRanking ausente em um slide', () => {
   const config = configPadrao();
-  delete config.requisitoRanking;
+  delete config.slides[0].requisitoRanking;
   const resultado = validarConfig(config);
   assert.equal(resultado.valido, false);
-  assert.ok(resultado.erros.some((e) => e.includes('requisitoRanking')));
+  assert.ok(resultado.erros.some((e) => e.includes('slides[0].requisitoRanking')));
 });
 
 test('validarConfig rejeita condicao com metrica desconhecida', () => {
   const config = configPadrao();
-  config.requisitoRanking.condicoes[0].metrica = 'campo-fantasma';
+  config.slides[0].requisitoRanking.condicoes[0].metrica = 'campo-fantasma';
   const resultado = validarConfig(config);
   assert.equal(resultado.valido, false);
-  assert.ok(resultado.erros.some((e) => e.includes('requisitoRanking.condicoes[0].metrica')));
+  assert.ok(resultado.erros.some((e) => e.includes('slides[0].requisitoRanking.condicoes[0].metrica')));
 });
 
 test('validarConfig aceita requisitoPodio ativo com condicao extra ligada', () => {
   const config = configPadrao();
-  config.requisitoPodio.ativo = true;
-  config.requisitoPodio.condicoes[1] = { ativo: true, metrica: 'contratos', valorMinimo: 3 };
+  config.slides[0].requisitoPodio.ativo = true;
+  config.slides[0].requisitoPodio.condicoes[1] = { ativo: true, metrica: 'contratos', valorMinimo: 3 };
   assert.equal(validarConfig(config).valido, true);
 });
 
-test('validarConfig rejeita requisitoPodio ausente', () => {
+test('validarConfig rejeita requisitoPodio ausente em um slide', () => {
   const config = configPadrao();
-  delete config.requisitoPodio;
+  delete config.slides[0].requisitoPodio;
   const resultado = validarConfig(config);
   assert.equal(resultado.valido, false);
-  assert.ok(resultado.erros.some((e) => e.includes('requisitoPodio')));
+  assert.ok(resultado.erros.some((e) => e.includes('slides[0].requisitoPodio')));
 });
 
 test('validarConfig rejeita requisitoPodio sem exatamente 3 condicoes', () => {
   const config = configPadrao();
-  config.requisitoPodio.condicoes = [{ metrica: 'aproveitamento', valorMinimo: 60 }];
+  config.slides[0].requisitoPodio.condicoes = [{ metrica: 'aproveitamento', valorMinimo: 60 }];
   const resultado = validarConfig(config);
   assert.equal(resultado.valido, false);
-  assert.ok(resultado.erros.some((e) => e.includes('requisitoPodio.condicoes')));
+  assert.ok(resultado.erros.some((e) => e.includes('slides[0].requisitoPodio.condicoes')));
 });
 
 test('validarConfig rejeita condicao extra sem "ativo" booleano', () => {
   const config = configPadrao();
-  config.requisitoPodio.condicoes[1] = { metrica: 'contratos', valorMinimo: 3 };
+  config.slides[0].requisitoPodio.condicoes[1] = { metrica: 'contratos', valorMinimo: 3 };
   const resultado = validarConfig(config);
   assert.equal(resultado.valido, false);
-  assert.ok(resultado.erros.some((e) => e.includes('requisitoPodio.condicoes[1].ativo')));
+  assert.ok(resultado.erros.some((e) => e.includes('slides[0].requisitoPodio.condicoes[1].ativo')));
 });
 
 test('validarConfig rejeita condicao com valorMinimo que não seja número', () => {
   const config = configPadrao();
-  config.requisitoPodio.condicoes[0].valorMinimo = '60';
+  config.slides[0].requisitoPodio.condicoes[0].valorMinimo = '60';
   const resultado = validarConfig(config);
   assert.equal(resultado.valido, false);
-  assert.ok(resultado.erros.some((e) => e.includes('requisitoPodio.condicoes[0].valorMinimo')));
+  assert.ok(resultado.erros.some((e) => e.includes('slides[0].requisitoPodio.condicoes[0].valorMinimo')));
 });

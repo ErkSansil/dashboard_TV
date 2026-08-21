@@ -25,6 +25,16 @@ input[type="number"]::-webkit-inner-spin-button {
   margin: 0;
 }
 
+input[type="text"], input[type="password"], input[type="number"], textarea {
+  cursor: text;
+}
+select {
+  cursor: pointer;
+}
+input:disabled, select:disabled, textarea:disabled {
+  cursor: not-allowed;
+}
+
 body {
   margin: 0;
   font-family: var(--fonte);

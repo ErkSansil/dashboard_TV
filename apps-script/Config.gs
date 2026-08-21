@@ -30,36 +30,38 @@ function configPadrao() {
     rotuloExtra2: '',
     fixado: null,
     fixarAtePosicao: 0,
-    requisitoPodio: requisitoPadrao(60),
-    requisitoRanking: requisitoPadrao(0),
     slides: [
       {
         chave: 'vendas-dia', setor: 'vendas', periodo: 'dia', ativo: true, duracaoSegundos: 20,
         modoTroca: 'tempo', voltasScroll: 1,
         linhaInicial: 4,
         colunas: { nome: 'E', aproveitamento: 'F', vendasImediato: 'G', contratos: 'H', extra1: 'I', extra2: 'J' },
-        rotuloCelulas: ['F2'], ordenarPor: 'aproveitamento', direcao: 'desc'
+        rotuloCelulas: ['F2'], ordenarPor: 'aproveitamento', direcao: 'desc',
+        requisitoPodio: requisitoPadrao(60), requisitoRanking: requisitoPadrao(0)
       },
       {
         chave: 'vendas-semana', setor: 'vendas', periodo: 'semana', ativo: true, duracaoSegundos: 20,
         modoTroca: 'tempo', voltasScroll: 1,
         linhaInicial: 4,
         colunas: { nome: 'P', aproveitamento: 'Q', vendasImediato: 'R', contratos: 'S', extra1: 'T', extra2: 'U' },
-        rotuloCelulas: ['Q2', 'R2'], ordenarPor: 'aproveitamento', direcao: 'desc'
+        rotuloCelulas: ['Q2', 'R2'], ordenarPor: 'aproveitamento', direcao: 'desc',
+        requisitoPodio: requisitoPadrao(60), requisitoRanking: requisitoPadrao(0)
       },
       {
         chave: 'vendas-mes', setor: 'vendas', periodo: 'mes', ativo: true, duracaoSegundos: 20,
         modoTroca: 'tempo', voltasScroll: 1,
         linhaInicial: 4,
         colunas: { nome: 'AA', aproveitamento: 'AB', vendasImediato: 'AC', contratos: 'AD', extra1: 'AE', extra2: 'AF' },
-        rotuloCelulas: ['AA2', 'AB2', 'AC2'], ordenarPor: 'aproveitamento', direcao: 'desc'
+        rotuloCelulas: ['AA2', 'AB2', 'AC2'], ordenarPor: 'aproveitamento', direcao: 'desc',
+        requisitoPodio: requisitoPadrao(60), requisitoRanking: requisitoPadrao(0)
       },
       {
         chave: 'vendas-ano', setor: 'vendas', periodo: 'ano', ativo: false, duracaoSegundos: 20,
         modoTroca: 'tempo', voltasScroll: 1,
         linhaInicial: 4,
         colunas: { nome: '', aproveitamento: '', vendasImediato: '', contratos: '', extra1: '', extra2: '' },
-        rotuloCelulas: [], ordenarPor: 'aproveitamento', direcao: 'desc'
+        rotuloCelulas: [], ordenarPor: 'aproveitamento', direcao: 'desc',
+        requisitoPodio: requisitoPadrao(60), requisitoRanking: requisitoPadrao(0)
       }
     ]
   };
@@ -122,6 +124,8 @@ function validarConfig(config) {
       if (typeof slide.voltasScroll !== 'number' || slide.voltasScroll < 0) {
         erros.push('slide ' + indice + ': voltasScroll precisa ser um número maior ou igual a 0');
       }
+      validarRequisito(slide.requisitoPodio, 'slides[' + indice + '].requisitoPodio', erros);
+      validarRequisito(slide.requisitoRanking, 'slides[' + indice + '].requisitoRanking', erros);
     });
   }
   if (typeof config.qtdLista !== 'number' || config.qtdLista < 0) {
@@ -166,8 +170,6 @@ function validarConfig(config) {
   if (typeof config.fixarAtePosicao !== 'number' || config.fixarAtePosicao < 0) {
     erros.push('fixarAtePosicao precisa ser um número maior ou igual a 0 (0 = nenhuma fixa)');
   }
-  validarRequisito(config.requisitoPodio, 'requisitoPodio', erros);
-  validarRequisito(config.requisitoRanking, 'requisitoRanking', erros);
   return { valido: erros.length === 0, erros: erros };
 }
 

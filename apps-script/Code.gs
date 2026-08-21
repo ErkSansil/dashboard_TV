@@ -5,7 +5,7 @@ var ABA_EQUIPE = 'EQUIPE';
 var ABA_CONFIG = 'CONFIG';
 var ABA_CREDENCIAIS = 'CREDENCIAIS DEV';
 var CELULA_CONFIG_JSON = 'B2';
-var VERSAO_BACKEND = '2026-08-21-1';
+var VERSAO_BACKEND = '2026-08-21-2';
 
 function doGet(e) {
   var acao = e.parameter.action;
@@ -91,13 +91,13 @@ function acaoRanking(setor, periodo) {
   var abaVendas = planilha.getSheetByName(ABA_VENDAS);
   var pessoas = lerRankingVendas(abaVendas, slide);
   pessoas = filtrarNomesExcluidos(pessoas, config.nomesExcluidos);
-  pessoas = filtrarPorRequisitoRanking(pessoas, config.requisitoRanking);
+  pessoas = filtrarPorRequisitoRanking(pessoas, slide.requisitoRanking);
   var ranking = montarRanking(pessoas, slide.ordenarPor, slide.direcao);
   var abaEquipe = planilha.getSheetByName(ABA_EQUIPE);
   var linhasEquipe = abaEquipe.getDataRange().getValues().slice(1);
   var mapaFotos = montarMapaFotos(linhasEquipe);
   var rankingComFotos = anexarFotos(ranking, mapaFotos);
-  var dividido = dividirPodioEResto(rankingComFotos, config.qtdLista, config.requisitoPodio);
+  var dividido = dividirPodioEResto(rankingComFotos, config.qtdLista, slide.requisitoPodio);
   return {
     ok: true,
     setor: setor,

@@ -152,7 +152,7 @@ function renderizar(slide, dados) {
   elPeriodo.className = 'cabecalho__periodo cabecalho__periodo--' + slide.periodo;
   document.getElementById('rotuloData').textContent = dados.rotulo || '';
   var metricas = metricasParaExibir(ESTADO.config);
-  renderizarPodio(dados.podio, metricas, ESTADO.config);
+  renderizarPodio(dados.podio, metricas, ESTADO.config, slide.requisitoPodio);
   renderizarLista(dados.resto, metricas, ESTADO.config, slide);
 }
 
@@ -190,8 +190,7 @@ function metricasParaExibir(config) {
   return metricas && metricas.length > 0 ? metricas : ['aproveitamento'];
 }
 
-function mensagemPodioVazio(config) {
-  var requisito = config && config.requisitoPodio;
+function mensagemPodioVazio(requisito, config) {
   if (requisito && requisito.ativo && Array.isArray(requisito.condicoes)) {
     var partes = requisito.condicoes
       .filter(function (condicao, indice) { return indice === 0 || condicao.ativo; })
@@ -204,7 +203,7 @@ function mensagemPodioVazio(config) {
   return 'Ainda vazio — essa vaga tá esperando alguém';
 }
 
-function renderizarPodio(podio, metricas, config) {
+function renderizarPodio(podio, metricas, config, requisitoPodio) {
   var container = document.getElementById('podio');
   container.innerHTML = '';
   var principal = metricas[0];
@@ -215,7 +214,7 @@ function renderizarPodio(podio, metricas, config) {
     var item = document.createElement('div');
     if (!pessoa) {
       item.className = 'podio__item podio__item--pos' + posicaoSlot + ' podio__item--vazio';
-      item.innerHTML = '<div class="podio__vazio-texto">' + mensagemPodioVazio(config) + '</div>';
+      item.innerHTML = '<div class="podio__vazio-texto">' + mensagemPodioVazio(requisitoPodio, config) + '</div>';
       container.appendChild(item);
       return;
     }
