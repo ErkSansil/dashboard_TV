@@ -67,6 +67,12 @@ h1, h2 { font-family: var(--fonte-display); }
   font-family: var(--fonte);
 }
 
+.tela-login input {
+  background: var(--bg-elevado);
+  color: var(--texto);
+  caret-color: var(--acento-escuro);
+}
+
 .tela-login input:focus {
   outline: none;
   border-color: var(--acento);
@@ -160,6 +166,9 @@ h1, h2 { font-family: var(--fonte-display); }
   border: 1px solid var(--borda) !important;
   font-size: 0.85rem !important;
   font-family: var(--fonte) !important;
+  background: var(--bg-elevado) !important;
+  color: var(--texto) !important;
+  caret-color: var(--acento-escuro) !important;
 }
 .campo select, .campo input, .campo textarea {
   padding: 0.6rem 0.7rem;
@@ -169,6 +178,7 @@ h1, h2 { font-family: var(--fonte-display); }
   font-size: 0.9rem;
   background: var(--bg-elevado);
   color: var(--texto);
+  caret-color: var(--acento-escuro);
 }
 .campo textarea { resize: vertical; }
 .campo select:focus, .campo input:focus, .campo textarea:focus {
@@ -206,6 +216,14 @@ h1, h2 { font-family: var(--fonte-display); }
   border-radius: 8px;
   border: 1px solid var(--borda);
   font-family: var(--fonte);
+  background: var(--bg-elevado);
+  color: var(--texto);
+  caret-color: var(--acento-escuro);
+}
+.campo-slide input:focus, .campo-slide select:focus {
+  outline: none;
+  border-color: var(--acento);
+  box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.15);
 }
 
 .campo-slide.campo-slide--colapsavel {
@@ -276,6 +294,7 @@ h1, h2 { font-family: var(--fonte-display); }
 .campo-slide__corpo select:disabled {
   cursor: not-allowed;
   background: var(--bg);
+  color: var(--texto-sub);
 }
 
 .barra-salvar {
